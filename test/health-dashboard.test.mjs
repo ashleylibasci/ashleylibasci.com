@@ -2,7 +2,7 @@
 // sample-data wording, and the rules the page and its components keep in their source.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NAV } from '../src/lib/nav.ts';
@@ -88,9 +88,9 @@ test('the page takes the title and the write-up from the entry and places it by 
 
 test('the Work tab is current and no nav item is added', () => {
   assert.match(page, /const work = navItem\('work'\);/);
-  assert.deepEqual(
-    NAV.map((item) => item.key),
-    ['home', 'work', 'experience'],
+  assert.equal(
+    NAV.some((item) => item.href === '/health-dashboard'),
+    false,
   );
 });
 
@@ -150,13 +150,6 @@ test('no client script, no hover motion and no color value outside the tokens', 
     assert.equal(/transform|transition|animation/.test(text), false);
     assert.equal(/#[0-9a-fA-F]{3,8}\b/.test(text), false);
   }
-});
-
-test('nothing of the Research page is built here', () => {
-  for (const name of ['CodeBlock', 'CropFrame']) {
-    assert.equal(existsSync(join(src, 'components', `${name}.astro`)), false);
-  }
-  assert.equal(existsSync(join(src, 'pages', 'research.astro')), false);
 });
 
 test('a figure in the lead fails the build', () => {

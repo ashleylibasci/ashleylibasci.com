@@ -9,9 +9,11 @@ interface Props {
   standfirst?: string;
   /** Breadcrumb steps before this page, first to last. */
   crumbs?: readonly { label: string; href: string }[];
+  /** The breadcrumb's last step, when it is not the title. */
+  current?: string;
 }
 
-const { title, standfirst, crumbs = [] } = Astro.props;
+const { title, standfirst, crumbs = [], current = title } = Astro.props;
 // Rendered first so a links slot that comes out empty adds no row and no gap.
 const links = Astro.slots.has('links') ? (await Astro.slots.render('links')).trim() : '';
 ---
@@ -24,7 +26,7 @@ const links = Astro.slots.has('links') ? (await Astro.slots.render('links')).tri
           {' / '}
         </Fragment>
       ))
-    }<span>{title}</span>
+    }<span>{current}</span>
   </nav>
   <h1 id="page-heading" tabindex="-1">{title}</h1>
   <p class="standfirst"><slot name="standfirst">{standfirst}</slot></p>

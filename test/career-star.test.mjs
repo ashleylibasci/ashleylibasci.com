@@ -142,9 +142,9 @@ test('the Work tab is current, the crumbs lead home and to Work, and no nav item
   assert.match(page, /\{ label: home\.label, href: home\.href \},\s*\{ label: work\.label, href: work\.href \},/);
   assert.match(head, /<h1 id="page-heading" tabindex="-1">\{title\}<\/h1>/);
   assert.match(head, /<p class="standfirst"><slot name="standfirst">\{standfirst\}<\/slot><\/p>/);
-  assert.deepEqual(
-    NAV.map((item) => item.key),
-    ['home', 'work', 'experience'],
+  assert.equal(
+    NAV.some((item) => item.href === '/career-star'),
+    false,
   );
 });
 

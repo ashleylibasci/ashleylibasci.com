@@ -3,8 +3,8 @@
 // (default slot) and, when given, a wide block in columns 4 to 12 under it (`wide` slot).
 // Goes inside `.wrap.art`, which base.css lays out. The text is Markdown HTML and carries no
 // scope attribute, so the styles for what it holds (subheads, the Feature list `dl.feat`,
-// the Facts list `dl.facts`, the Formula block `.math`, the Highlight `mark`, a plain list)
-// are global, under `.art`.
+// the Facts list `dl.facts`, the Formula block `.math`, the Highlight `mark`, a plain list,
+// the Code block `.code` and its caption `.cap`) are global, under `.art`.
 interface Props {
   id: string;
   /** The heading's inner HTML, as the Markdown processor gives it. */
@@ -88,6 +88,51 @@ const wide = Astro.slots.has('wide') ? (await Astro.slots.render('wide')).trim()
 
   .art .math .n {
     margin-left: var(--space-2);
+    font: var(--type-meta);
+    color: var(--color-ink-3);
+  }
+
+  /* Code block: a file-name bar over monospace code. Long lines scroll inside the block. */
+  .art .code {
+    margin-top: var(--space-4);
+    max-width: 42em;
+    background: var(--color-code);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    /* The scroll area's corners follow the block's. */
+    overflow: hidden;
+  }
+
+  .art .code .fn {
+    padding: var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--color-line);
+    font: var(--type-caption);
+    color: var(--color-ink-3);
+  }
+
+  .art .code pre {
+    margin: 0;
+    padding: var(--space-4);
+    overflow-x: auto;
+    font: var(--type-code);
+    color: var(--color-ink);
+  }
+
+  .art .code pre:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .art .code .c {
+    color: var(--color-ink-3);
+  }
+
+  .art .code .k {
+    color: var(--color-link);
+  }
+
+  /* The line under a Code block. */
+  .art .col > .cap {
+    margin-top: var(--space-2);
     font: var(--type-meta);
     color: var(--color-ink-3);
   }

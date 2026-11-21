@@ -1,0 +1,71 @@
+---
+// Research: the Illinois Mathematics Lab project. Every sentence of the write-up is the
+// Markdown body of the project entry, placed by position: the lead is the standfirst, each
+// heading opens an Article section, and a [[figure:name]] paragraph is a picture with its
+// caption. The schema carries no image fields, so the screenshot and its alt text are
+// mapped here. The screenshot is never a link: the site it shows is not public yet.
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ArticleSection from '../components/ArticleSection.astro';
+import CropFrame from '../components/CropFrame.astro';
+import PageHead from '../components/PageHead.astro';
+import { checkFigures, splitArticle } from '../lib/article';
+import { navItem } from '../lib/nav';
+import proofOfHistory from '../assets/proof-of-history.png';
+
+const ID = 'research';
+
+// The pictures the write-up places by name.
+const CROPS: Record<string, { image: typeof proofOfHistory; alt: string }> = {
+  opening: {
+    image: proofOfHistory,
+    alt: 'The Proof of History home page: a dark green page with the headline How Mathematicians Shared and Tested Their Work.',
+  },
+};
+
+const page = navItem('research');
+const home = navItem('home');
+
+const entry = await getEntry('projects', ID);
+if (!entry) throw new Error(`${ID}: the project entry is missing`);
+const html = entry.rendered?.html;
+if (!html?.trim()) throw new Error(`${ID}: the project entry has no write-up`);
+
+const article = splitArticle(html);
+// An unknown figure name, or a figure the write-up never uses, fails the build.
+checkFigures(article, Object.keys(CROPS), ID);
+
+// The lead is one standfirst paragraph.
+const [first, ...more] = article.leadParts;
+const standfirst = first?.kind === 'html' ? first.html.match(/^<p>((?:(?!<\/?p[\s>])[\s\S])*)<\/p>$/)?.[1] : undefined;
+if (!standfirst || more.length > 0) {
+  throw new Error(`${ID}: the lead must be one standfirst paragraph`);
+}
+
+const sections = article.sections.map((section) => ({
+  ...section,
+  parts: section.parts.map((part) => (part.kind === 'figure' ? { ...part, ...CROPS[part.name] } : part)),
+}));
+---
+<Base title={page.label} section={page.key}>
+  <PageHead title={entry.data.title} current={page.label} crumbs={[{ label: home.label, href: home.href }]}>
+    <Fragment slot="standfirst" set:html={standfirst} />
+  </PageHead>
+  <div class="wrap art">
+    {
+      sections.map((section) => (
+        <ArticleSection id={section.id} heading={section.heading}>
+          {section.parts.map((part) =>
+            part.kind === 'html' ? (
+              <Fragment set:html={part.html} />
+            ) : (
+              <CropFrame src={part.image} alt={part.alt}>
+                <Fragment set:html={part.caption} />
+              </CropFrame>
+            ),
+          )}
+        </ArticleSection>
+      ))
+    }
+  </div>
+</Base>

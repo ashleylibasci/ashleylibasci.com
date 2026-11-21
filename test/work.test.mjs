@@ -240,6 +240,6 @@ test('the page head and the Work tab', () => {
   assert.deepEqual(tabs[0], { key: 'work', label: 'Work', href: '/work', tab: true });
   assert.deepEqual(
     NAV.map((item) => item.key),
-    ['home', 'work', 'experience'],
+    ['home', 'work', 'research', 'experience'],
   );
 });
