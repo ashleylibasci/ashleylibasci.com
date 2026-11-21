@@ -1,10 +1,11 @@
 ---
 import { COPYRIGHT_YEAR, UPDATED_LABEL } from '../lib/build-time';
+import FooterDog from '../islands/footer-dog/FooterDog.astro';
 import { SITE_NAME } from '../lib/nav';
 ---
 <footer class="foot">
-  <div class="wrap">
-    <span class="cr"><span>© {COPYRIGHT_YEAR} {SITE_NAME}</span><span data-slot="footer-drawing"></span></span>
+  <div class="wrap" data-dog-row>
+    <span class="cr"><span>© {COPYRIGHT_YEAR} {SITE_NAME}</span><span data-slot="footer-drawing"><FooterDog /></span></span>
     <span>Updated {UPDATED_LABEL}</span>
   </div>
 </footer>
@@ -30,9 +31,16 @@ import { SITE_NAME } from '../lib/nav';
     display: flex;
     align-items: flex-end;
     gap: 14px;
+    /* With the drawing in, a one-line footer is 82px: the room the lost page keeps for it. */
+    min-height: 33px;
   }
 
   .cr > span {
     padding-bottom: 1px;
+  }
+
+  /* The drawing sits on the same line as the text, with no line box of its own. */
+  .cr > [data-slot] {
+    display: flex;
   }
 </style>

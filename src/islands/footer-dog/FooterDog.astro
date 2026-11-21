@@ -1,0 +1,294 @@
+---
+// A small dog beside the © line (AD-5 island; the only writer of the dog, AD-18).
+// It wags on hover. A tap raises a hurdle and it hops across; five quick taps
+// stand six poles up and it runs through them. In dark mode it sleeps until
+// tapped. Without the script it still stands, or sleeps, and wags.
+import Dog from '../../components/drawings/Dog.astro';
+---
+<span class="dog-egg" data-footer-dog tabindex="0" role="img" aria-label="A small dog">
+  <span class="dog" data-dog><Dog pose="standing" /></span>
+  <span class="nap" aria-hidden="true"><Dog pose="curled" /></span>
+  <span class="zz" aria-hidden="true"><i>z</i><i>z</i><i>z</i></span>
+  <span class="hurdle" data-hurdle aria-hidden="true">
+    <svg viewBox="0 0 16 15" width="16" height="15" focusable="false">
+      <path d="M2 14.5 V3.5 M14 14.5 V3.5" />
+      <path class="bar" d="M1 6.5 H15" />
+    </svg>
+  </span>
+  <span class="poles" data-poles aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+</span>
+
+<script>
+  import './footer-dog.ts';
+</script>
+
+<style>
+  .dog-egg {
+    /* A little see-through at night. */
+    --dog-opacity: 1;
+    position: relative;
+    display: inline-block;
+    width: 108px;
+    height: 31px;
+    flex: none;
+    cursor: pointer;
+    outline: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :global(:root[data-theme='dark']) .dog-egg {
+    --dog-opacity: 0.82;
+  }
+
+  .dog,
+  .nap {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 42px;
+    height: 30px;
+    opacity: var(--dog-opacity);
+  }
+
+  .dog {
+    z-index: 2;
+    transform-origin: 50% 100%;
+  }
+
+  .nap {
+    display: none;
+  }
+
+  /* The ring goes on whichever drawing shows. */
+  .dog-egg:focus-visible .dog,
+  .dog-egg:focus-visible .nap {
+    outline: 1.5px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .dog-egg:hover :global(.tail) {
+    animation: dog-wag 0.3s ease-in-out 4;
+  }
+
+  @keyframes dog-wag {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+
+    25% {
+      transform: rotate(-14deg);
+    }
+
+    75% {
+      transform: rotate(12deg);
+    }
+  }
+
+  .dog-egg.sit :global(.pose) {
+    transform: rotate(-16deg);
+  }
+
+  .hurdle {
+    position: absolute;
+    left: 46px;
+    bottom: 0;
+    width: 16px;
+    height: 15px;
+    opacity: 0;
+    transform: scaleY(0.2);
+    transform-origin: 50% 100%;
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out;
+  }
+
+  .hurdle.up {
+    opacity: var(--dog-opacity);
+    transform: none;
+  }
+
+  .hurdle svg {
+    display: block;
+  }
+
+  .hurdle path {
+    fill: none;
+    stroke: var(--color-ink-3);
+    stroke-width: 1.3;
+    stroke-linecap: round;
+  }
+
+  .hurdle .bar {
+    stroke: var(--color-teal);
+    stroke-width: 1.6;
+  }
+
+  .poles {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  /* Odd poles stand in front of the dog, even ones behind it. */
+  .poles i {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 1.2px;
+    height: 24px;
+    background: var(--color-ink-3);
+    border-radius: 1px;
+    opacity: 0;
+    transform: scaleY(0.2);
+    transform-origin: 50% 100%;
+    transition:
+      opacity 0.25s ease-out,
+      transform 0.3s var(--ease);
+  }
+
+  .poles i:nth-child(odd) {
+    z-index: 3;
+  }
+
+  .poles i:nth-child(2) {
+    transition-delay: 70ms;
+  }
+
+  .poles i:nth-child(3) {
+    transition-delay: 140ms;
+  }
+
+  .poles i:nth-child(4) {
+    transition-delay: 210ms;
+  }
+
+  .poles i:nth-child(5) {
+    transition-delay: 280ms;
+  }
+
+  .poles i:nth-child(6) {
+    transition-delay: 350ms;
+  }
+
+  .poles i::before {
+    content: '';
+    position: absolute;
+    left: -0.3px;
+    right: -0.3px;
+    top: 0;
+    height: 5px;
+    border-radius: 1px;
+    background: var(--color-teal);
+  }
+
+  .poles.on i {
+    opacity: var(--dog-opacity);
+    transform: none;
+  }
+
+  /* Asleep: small z's drift up now and then. */
+  .zz {
+    position: absolute;
+    left: 33px;
+    bottom: 13px;
+    width: 16px;
+    height: 22px;
+    display: none;
+    pointer-events: none;
+  }
+
+  .zz i {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font: 400 9px/1 var(--font-body);
+    font-style: normal;
+    color: var(--color-egg-teal);
+    opacity: 0;
+    animation: dog-zz 8s ease-out infinite;
+  }
+
+  .zz i:nth-child(2) {
+    animation-delay: 1.3s;
+  }
+
+  .zz i:nth-child(3) {
+    animation-delay: 2.6s;
+  }
+
+  @keyframes dog-zz {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0);
+    }
+
+    5% {
+      opacity: 0.6;
+    }
+
+    30% {
+      opacity: 0.6;
+    }
+
+    42% {
+      opacity: 0;
+      transform: translate(7px, -17px);
+    }
+
+    100% {
+      opacity: 0;
+      transform: translate(7px, -17px);
+    }
+  }
+
+  /* Dark mode: curled up asleep until tapped. Hover or focus opens one eye. */
+  :global(:root[data-theme='dark']) .dog-egg:not(.awake) .dog {
+    visibility: hidden;
+  }
+
+  :global(:root[data-theme='dark']) .dog-egg:not(.awake) .nap,
+  :global(:root[data-theme='dark']) .dog-egg:not(.awake) .zz {
+    display: block;
+  }
+
+  :global(:root[data-theme='dark']) .dog-egg:not(.awake):hover .zz {
+    opacity: 0;
+  }
+
+  .dog-egg:hover :global(.eye-open),
+  .dog-egg:focus-visible :global(.eye-open) {
+    opacity: 1;
+  }
+
+  .dog-egg:hover :global(.eye-shut),
+  .dog-egg:focus-visible :global(.eye-shut) {
+    opacity: 0;
+  }
+
+  /* No motion: the global rule stops the drift, and one z stays put. */
+  @media (prefers-reduced-motion: reduce) {
+    .zz i:first-child {
+      opacity: 0.6;
+      transform: translate(3px, -6px);
+    }
+  }
+
+  /* The drawing stays small; its touch area is 44px tall. */
+  @media (max-width: 760px) {
+    .dog-egg::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 44px;
+      transform: translateY(-50%);
+    }
+  }
+</style>

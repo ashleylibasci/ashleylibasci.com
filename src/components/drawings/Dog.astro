@@ -1,0 +1,115 @@
+---
+// A small dog, drawn two ways: standing, or curled up asleep. A static drawing
+// with no script. Whoever places it sets its box; the paint comes from tokens.
+// The standing drawing carries a clip-path id, so it goes on a page once.
+interface Props {
+  pose: 'standing' | 'curled';
+}
+
+const { pose } = Astro.props;
+---
+{
+  pose === 'standing' ? (
+    <svg class="dog-drawing" viewBox="0 0 64 46" aria-hidden="true" focusable="false">
+      <defs>
+        <clipPath id="dog-ground">
+          <rect x="-12" y="-12" width="88" height="55.85" />
+        </clipPath>
+      </defs>
+      <g clip-path="url(#dog-ground)">
+        <path class="t2" d="M34.6 27.4 L34.4 43.4 H38 L38.4 27.4 Z" />
+        <path class="t" d="M38.8 27 L38.9 43.4 H43.2 L43 27 Z" />
+        <g class="pose">
+          <path class="t2" d="M20.2 27.6 C19 31 19.2 34 19.8 37.2 L19.5 43.4 H23.2 L23.5 37.6 C24.4 34.4 25.6 31.4 26.4 28.6 Z" />
+          <path class="t" d="M14.2 25 C12.6 30 13 33.6 13.6 37 L13.2 43.4 H17.4 L17.7 37.6 C18.8 34.4 20.4 31.2 21.8 28 Z" />
+          <g class="tail">
+            <path class="s" d="M13.4 18.4 C12.4 14 12.4 9.6 13.5 5.4 C14 4.6 15.4 4.7 15.8 5.6 C15.6 9.4 16 13.6 17.2 17.6 Z" />
+          </g>
+          <path class="t" d="M37.4 17.6 C38.2 13 40.2 9 43.2 6.2 L47.6 8.4 C47.4 12 46.4 16.6 44.6 20.2 Z" />
+          <path class="t" d="M13.4 17.2 C12 20.6 12.2 25.4 14.6 28.2 C18.4 29.8 22 30 25.6 29.6 C29.6 29.2 33.6 29.6 37.6 29 L42.4 28.4 C44.8 25 45.2 20.4 43.4 16.6 L41 13.6 C33.6 14.2 23.6 14.8 13.4 17.2 Z" />
+          <path class="s" d="M13.4 17.2 C12.6 19.4 12.6 21.8 13.2 24 C19.4 24.6 27.6 24.6 35.4 23.6 C38.4 23.2 40.4 21 40.8 17.6 L40.6 13.7 C33.2 14.3 23.4 14.9 13.4 17.2 Z" />
+          <path class="t" d="M43 5.4 C45 4.4 48.2 4.6 50.6 5.6 L59 6.4 C60 6.6 60.6 7.4 60.6 8.4 L60.6 10.8 C60.6 12.8 59.8 14.6 58 15.4 C56 16.2 53.6 15.8 52.4 14.4 L50.2 12.8 C48.2 13 46.2 12.8 44.6 11.6 C42.9 10.2 42.3 7.2 43 5.4 Z" />
+          <path class="t" d="M52.2 12.2 C54.4 12.8 57.6 12.6 60.2 11.6 C60.4 13.6 59.6 15.8 57.8 16.6 C56 17.2 53.6 16.8 52.6 15.2 C52.2 14.4 52 13.2 52.2 12.2 Z" />
+          <path class="t2" d="M44.4 5.2 L48.6 5.6 L46.6 9.8 Z" />
+          <path class="w" d="M52.4 11 C55 11.6 57.8 11.4 60.4 10.8 M54.4 14 L54.2 16 M56.4 14.2 L56.3 16.6 M58.4 13.8 L58.6 15.8 M47.8 6.4 L50.8 6.8" />
+          <ellipse class="k" cx="59.7" cy="7.6" rx="1.2" ry="1.1" />
+          <circle class="k" cx="49.4" cy="7.9" r=".8" />
+        </g>
+      </g>
+    </svg>
+  ) : (
+    <svg class="dog-drawing" viewBox="0 0 64 46" aria-hidden="true" focusable="false">
+      <path class="s" d="M11.2 41.6C8.2 41.4 6.2 39.6 6.6 37.4 6.8 36.4 8.2 36.2 8.8 37 9.2 38.6 10.4 39.4 12 39.6Z" />
+      <path class="t" d="M10 43.4C8.8 38.8 10.8 33.6 16 31.4 22 29 31.6 28.8 38.4 30.4 43.2 31.6 46.4 35.6 46.4 40L46 43.4Z" />
+      <path class="s" d="M12.4 35.8C14.2 32.4 18.2 30.6 23 30 29.6 29.2 35.4 29.6 39.4 31 40.6 33.4 39.8 35.8 37.4 36.6 30 37.8 20.6 37.8 12.4 35.8Z" />
+      <path class="t2" d="M11.6 43.4C10.8 40 12.8 37.2 16.6 37 20.4 36.8 23 39.4 22.4 43.4Z" />
+      <path class="t2" d="M36 43.4C36.4 41.4 38.4 40.4 41 40.4H52.6C54.4 40.4 55.4 41.6 55 43.4Z" />
+      <path class="t" d="M38 43.4C38.4 42 40 41.4 42 41.4H54.6C56.2 41.4 57 42.4 56.6 43.4Z" />
+      <path class="t" d="M36.6 31C39 29.8 42 29.8 44.4 31L45.6 38.6 38.4 39.6Z" />
+      <g transform="translate(-1.4 26)">
+        <path class="t" d="M43 5.4 C45 4.4 48.2 4.6 50.6 5.6 L59 6.4 C60 6.6 60.6 7.4 60.6 8.4 L60.6 10.8 C60.6 12.8 59.8 14.6 58 15.4 C56 16.2 53.6 15.8 52.4 14.4 L50.2 12.8 C48.2 13 46.2 12.8 44.6 11.6 C42.9 10.2 42.3 7.2 43 5.4 Z" />
+        <path class="t" d="M52.2 12.2 C54.4 12.8 57.6 12.6 60.2 11.6 C60.4 13.6 59.6 15.8 57.8 16.6 C56 17.2 53.6 16.8 52.6 15.2 C52.2 14.4 52 13.2 52.2 12.2 Z" />
+        <path class="t2" d="M44.4 5.2 L48.6 5.6 L46.6 9.8 Z" />
+        <path class="w" d="M52.4 11 C55 11.6 57.8 11.4 60.4 10.8 M54.4 14 L54.2 16 M56.4 14.2 L56.3 16.6 M58.4 13.8 L58.6 15.8 M47.8 6.4 L50.8 6.8" />
+        <ellipse class="k" cx="59.7" cy="7.6" rx="1.2" ry="1.1" />
+        <path class="w eye-shut" d="M48.5 8C49.1 8.7 50 8.7 50.6 8" />
+        <circle class="k eye-open" cx="49.4" cy="7.9" r=".8" />
+      </g>
+    </svg>
+  )
+}
+
+<style>
+  .dog-drawing {
+    display: block;
+    width: 42px;
+    height: 30px;
+    overflow: visible;
+  }
+
+  /* Shared paint: coat, darker coat, saddle, solid marks, thin lines. */
+  .t,
+  .t2,
+  .s {
+    stroke: var(--color-dog-line);
+    stroke-width: 0.8;
+    stroke-linejoin: round;
+  }
+
+  .t {
+    fill: var(--color-dog-tan);
+  }
+
+  .t2 {
+    fill: var(--color-dog-tan-2);
+  }
+
+  .s,
+  .k {
+    fill: var(--color-dog-saddle);
+  }
+
+  .w {
+    fill: none;
+    stroke: var(--color-dog-line);
+    stroke-width: 0.6;
+    stroke-linecap: round;
+  }
+
+  /* Pivots for whoever moves the tail or sits the dog down. */
+  .tail {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+
+  .pose {
+    transform-box: view-box;
+    transform-origin: 40.5px 27px;
+    transition: transform 0.35s var(--ease);
+  }
+
+  /* Asleep: the eye is shut until someone opens it. */
+  .eye-open {
+    opacity: 0;
+  }
+</style>
