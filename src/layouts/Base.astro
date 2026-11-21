@@ -6,6 +6,7 @@ import { SITE_NAME } from '../lib/nav';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
 import PageFocus from '../islands/page-focus/PageFocus.astro';
+import SecretCode from '../islands/secret-code/SecretCode.astro';
 
 interface Props {
   /** Page name; the home page leaves it out and gets the bare site name. */
@@ -45,5 +46,6 @@ const fullTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
     </main>
     <Footer />
     <PageFocus />
+    <SecretCode />
   </body>
 </html>
