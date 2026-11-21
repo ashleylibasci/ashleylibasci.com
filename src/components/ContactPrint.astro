@@ -1,0 +1,195 @@
+---
+// Contact print: one numbered square print on the Contact sheet, with its caption.
+// A link when it is given an href; the same markup without the link otherwise.
+// It shows a picture cropped to the square, or a typeset note when there is none.
+import type { ImageMetadata } from 'astro';
+import FramedImage from './FramedImage.astro';
+import { printImage } from '../lib/print-image';
+
+interface Props {
+  /** Frame number, from 1. */
+  number: number;
+  name: string;
+  meta: string;
+  /** Accessible name of the link, after "Frame n:". */
+  label: string;
+  /** The page this print opens, or null while that page does not exist. */
+  href: string | null;
+  image?: ImageMetadata;
+  /** object-position of the crop. */
+  position?: string;
+  /** The line typeset on a print with no picture, and the source line above it. */
+  note?: string;
+  source?: string;
+}
+
+const { number, name, meta, label, href, image, position, note, source } = Astro.props;
+if (!image && !note) throw new Error(`ContactPrint: frame ${number} has neither a picture nor a note`);
+
+const Wrap = href ? 'a' : 'div';
+const wrapAttrs = href ? { href, 'aria-label': `Frame ${number}: ${label}` } : {};
+const picture = image ? printImage(image.width, image.height) : null;
+---
+<Wrap class="fr" {...wrapAttrs}>
+  <span class="pr">
+    {
+      image && picture ? (
+        <span class="im">
+          <FramedImage
+            src={image}
+            alt=""
+            widths={picture.widths}
+            sizes={picture.sizes}
+            position={position}
+            class="shot"
+          />
+        </span>
+      ) : (
+        <span class="im typeset">
+          <span class="ts-in" aria-hidden={href ? 'true' : undefined}>
+            {source && <span class="ts-src">{source}</span>}
+            <span class="ts-note">{note}</span>
+          </span>
+        </span>
+      )
+    }
+  </span>
+  <span class="fc">
+    <span class="fno">{number}</span>
+    <span class="ft">{name}</span>
+    <span class="fm">{meta}</span>
+  </span>
+</Wrap>
+
+<style>
+  .fr {
+    position: relative;
+    display: block;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  a.fr:hover {
+    color: var(--color-ink);
+  }
+
+  a.fr:focus-visible {
+    outline-offset: 6px;
+  }
+
+  /* The print: the same white border and hairline as the photo in the hero. */
+  .pr {
+    position: relative;
+    display: block;
+    background: var(--color-print);
+    padding: 7px;
+    border: 1px solid var(--color-print-line);
+    border-radius: var(--radius-print);
+  }
+
+  .im {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: var(--radius-hairline);
+    background: var(--color-photo-placeholder);
+  }
+
+  /* The picture fills the square whatever its own shape; the crop comes from object-position. */
+  .im .shot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    border-radius: 0;
+  }
+
+  /* A typeset print, no picture. Its colors are the same in both themes. */
+  .im.typeset {
+    container-type: size;
+    background: var(--color-typeset-print);
+    color: var(--color-typeset-ink);
+  }
+
+  .ts-in {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 8.5cqi;
+  }
+
+  .ts-src {
+    font-size: clamp(10px, 7.8cqi, 13px);
+    line-height: 1.3;
+    color: var(--color-typeset-source);
+  }
+
+  .ts-src::after {
+    content: '';
+    display: block;
+    width: 22px;
+    height: 1px;
+    background: var(--color-typeset-rule);
+    margin: 6cqi 0 5cqi;
+  }
+
+  .ts-note {
+    font: 400 clamp(11.5px, 10.2cqi, 19px) / 1.22 var(--font-display);
+    font-variant-numeric: lining-nums;
+    text-wrap: balance;
+  }
+
+  @container (max-width: 118px) {
+    .ts-src {
+      display: none;
+    }
+  }
+
+  /* The caption: the small frame number, then the name and a short line. */
+  .fc {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    column-gap: 4px;
+    margin-top: var(--space-3);
+  }
+
+  .fno {
+    grid-row: 1 / 3;
+    font: var(--type-small);
+    font-variant-numeric: tabular-nums lining-nums;
+    color: var(--color-ink-3);
+    padding-top: 5px;
+  }
+
+  .ft {
+    font: var(--type-print-title);
+    font-variant-numeric: lining-nums;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    transition: text-decoration-color var(--t) ease-out;
+  }
+
+  a.fr:hover .ft {
+    text-decoration-color: var(--color-aqua);
+  }
+
+  .fm {
+    grid-column: 2;
+    margin-top: 3px;
+    font: var(--type-caption);
+    font-variant-numeric: lining-nums;
+    color: var(--color-ink-3);
+  }
+
+  @media (max-width: 760px) {
+    .ft {
+      font-size: 16px;
+    }
+  }
+</style>

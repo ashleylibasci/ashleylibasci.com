@@ -51,6 +51,9 @@
   --color-device-bezel: #0b1726;
   --color-thumb-bezel: #05101d;
   --color-typeset-print: #fbfdfd;
+  --color-typeset-ink: #14294a;
+  --color-typeset-source: #566a80;
+  --color-typeset-rule: #1f8a84;
   --color-egg-line: #1f4d63;
   --color-egg-teal: #2a8f88;
   --color-egg-fill: #f6fbfc;

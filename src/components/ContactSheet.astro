@@ -1,0 +1,157 @@
+---
+// Selected work: a heading row, then a pale aqua Contact sheet holding one numbered
+// Contact print per entry of the projects collection, in `order`. Every word on a print
+// comes from the collection; the schema carries no image fields, so the picture and its
+// crop are mapped here by entry id.
+import type { ImageMetadata } from 'astro';
+import { getCollection } from 'astro:content';
+import ContactPrint from './ContactPrint.astro';
+import { fillTemplate } from '../lib/format';
+import { routeExists } from '../lib/routes';
+import healthSleep from '../assets/healthdash-sleep.jpg';
+import careerOg from '../assets/careerstar-og.png';
+import proofOfHistory from '../assets/proof-of-history.png';
+
+const PICTURES: Record<string, { image: ImageMetadata; position: string }> = {
+  'health-dashboard': { image: healthSleep, position: '50% 12%' },
+  'career-star': { image: careerOg, position: '0 50%' },
+  research: { image: proofOfHistory, position: '12% 50%' },
+};
+
+const WORK_HREF = '/work';
+const showAllWork = routeExists(WORK_HREF);
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+const prints = projects.map(({ id, data }, index) => {
+  const picture = PICTURES[id];
+  const note = data.print.note;
+  if (!picture && !note) {
+    throw new Error(`ContactSheet: the project entry "${id}" has neither a picture nor a print.note`);
+  }
+  return {
+    number: index + 1,
+    name: data.printName,
+    meta: fillTemplate(data.print.meta, data),
+    label: fillTemplate(data.print.label, data),
+    // The link waits for its page.
+    href: routeExists(data.href) ? data.href : null,
+    image: picture?.image,
+    position: picture?.position,
+    note: picture ? undefined : note,
+    source: picture ? undefined : data.title,
+  };
+});
+---
+<section class="sel wrap" aria-labelledby="h-sel">
+  <div class="sel-head">
+    <h2 id="h-sel">Selected work</h2>
+    <p>What I'm building right now, and what I built before it.</p>
+    {showAllWork && <a href={WORK_HREF}>All work</a>}
+  </div>
+  <div class="contact-sheet">
+    <ol class="strip">
+      {prints.map((print) => <li><ContactPrint {...print} /></li>)}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .sel {
+    padding-top: 80px;
+    padding-bottom: var(--space-4);
+  }
+
+  .sel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .sel-head h2 {
+    font: var(--type-section-title);
+    color: var(--color-ink);
+  }
+
+  .sel-head p {
+    font: var(--type-ui);
+    color: var(--color-ink-3);
+  }
+
+  .sel-head a {
+    margin-left: auto;
+    font: var(--type-ui);
+  }
+
+  .contact-sheet {
+    position: relative;
+    background: var(--color-band);
+    border: 1px solid var(--color-band-line);
+    border-radius: var(--radius-sheet);
+    padding: 34px 36px 30px;
+    transition: background-color var(--t) ease-out;
+  }
+
+  .strip {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  .strip > li {
+    position: relative;
+    min-width: 0;
+  }
+
+  @media (max-width: 1060px) {
+    .sel {
+      padding-top: var(--space-8);
+    }
+
+    .sel-head h2 {
+      font: var(--type-section-title-tablet);
+    }
+
+    .contact-sheet {
+      padding: 30px 30px 26px;
+    }
+
+    .strip {
+      gap: 26px;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .sel {
+      padding-top: 56px;
+      padding-bottom: var(--space-2);
+    }
+
+    .sel-head {
+      gap: var(--space-2) var(--space-5);
+      margin-bottom: var(--space-5);
+    }
+
+    .sel-head h2 {
+      font: var(--type-section-title-mobile);
+    }
+
+    .sel-head a {
+      margin-left: 0;
+    }
+
+    .contact-sheet {
+      padding: 22px 18px 20px;
+    }
+
+    .strip {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 30px 20px;
+    }
+  }
+</style>
