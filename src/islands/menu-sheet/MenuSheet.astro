@@ -32,7 +32,7 @@ const { items, section, siteName } = Astro.props;
     }
   </nav>
   <div class="sheet-foot">
-    <div data-slot="theme-toggle"></div>
+    <div data-slot="theme-toggle"><slot name="theme" /></div>
   </div>
 </dialog>
 

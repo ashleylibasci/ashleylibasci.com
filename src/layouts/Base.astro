@@ -16,12 +16,23 @@ interface Props {
 
 const { title, section } = Astro.props;
 const fullTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
+// The inline head script below sets the theme before first paint (AD-7):
+// light unless the stored choice is dark. It is the only initial writer.
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      (function () {
+        var theme = 'light';
+        try {
+          if (localStorage.getItem('al-theme') === 'dark') theme = 'dark';
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     <title>{fullTitle}</title>
     <Font cssVariable="--font-marcellus" preload={[{ weight: 400, style: 'normal' }]} />
     <Font cssVariable="--font-albert-sans" preload={[{ weight: 400, style: 'normal' }]} />

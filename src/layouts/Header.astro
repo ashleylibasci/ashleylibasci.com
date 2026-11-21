@@ -1,6 +1,7 @@
 ---
 import { NAV, SITE_NAME } from '../lib/nav';
 import MenuSheet from '../islands/menu-sheet/MenuSheet.astro';
+import ThemeToggle from '../islands/theme-toggle/ThemeToggle.astro';
 
 interface Props {
   section?: string;
@@ -24,8 +25,10 @@ const tabs = NAV.filter((item) => item.tab);
           </nav>
         )
       }
-      <div class="theme-slot" data-slot="theme-toggle"></div>
-      <MenuSheet items={NAV} section={section} siteName={SITE_NAME} />
+      <div class="theme-slot" data-slot="theme-toggle"><ThemeToggle /></div>
+      <MenuSheet items={NAV} section={section} siteName={SITE_NAME}>
+        <ThemeToggle slot="theme" />
+      </MenuSheet>
     </div>
   </div>
 </header>
@@ -94,6 +97,11 @@ const tabs = NAV.filter((item) => item.tab);
 
   .tabs a[aria-current='page']::after {
     transform: scaleX(1);
+  }
+
+  /* Without the head script the toggle is hidden, so its slot adds no gap. */
+  :global(html:not([data-theme])) .theme-slot {
+    display: none;
   }
 
   @media (max-width: 760px) {

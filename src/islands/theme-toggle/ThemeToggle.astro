@@ -1,0 +1,46 @@
+---
+// Theme toggle (AD-5 island, AD-7 runtime writer). Rendered once in the header
+// and once in the menu sheet; the script keeps every instance in step.
+---
+<button
+  class="toggle"
+  type="button"
+  data-theme-toggle
+  aria-pressed="false"
+  aria-label="Switch to dark theme">Dark</button>
+
+<script>
+  import './theme-toggle.ts';
+</script>
+
+<style>
+  .toggle {
+    font: var(--type-button-small);
+    color: var(--color-ink-2);
+    background: none;
+    border: 1px solid var(--color-line-2);
+    border-radius: var(--radius-full);
+    padding: 8px 16px;
+    cursor: pointer;
+    transition:
+      color var(--t) ease-out,
+      border-color var(--t) ease-out;
+  }
+
+  .toggle:hover {
+    color: var(--color-ink);
+    border-color: var(--color-ink-3);
+  }
+
+  /* No data-theme means the head script never ran: hide the dead button. */
+  :global(html:not([data-theme])) .toggle {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    .toggle {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+</style>
