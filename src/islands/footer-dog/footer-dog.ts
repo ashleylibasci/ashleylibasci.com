@@ -34,7 +34,7 @@ for (const root of document.querySelectorAll<HTMLElement>('[data-footer-dog]')) 
       hurdle.classList.toggle('up', up);
     },
     play(frames: Frame[], options: PlayOptions, finished?: () => void): Played {
-      const animation = dog.animate(frames, { ...options, fill: 'both' });
+      const animation = dog.animate(frames, { ...options, fill: 'forwards' });
       if (finished) animation.addEventListener('finish', finished, { once: true });
       return animation;
     },

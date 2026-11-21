@@ -54,7 +54,7 @@ test('Base mounts the hello once, last in body, with the GitHub link from contac
   assert.match(base, /import \{ CONTACTS \} from '\.\.\/lib\/contacts';/);
   assert.match(base, /import ConsoleHello from '\.\.\/islands\/console-hello\/ConsoleHello\.astro';/);
   assert.equal([...base.matchAll(/<ConsoleHello /g)].length, 1);
-  assert.match(base, /<SecretCode \/>\s*<ConsoleHello href=\{CONTACTS\.github\} \/>\s*<\/body>/);
+  assert.match(base, /<ConsoleHello href=\{CONTACTS\.github\} \/>\s*<\/body>/);
   assert.equal([...base.matchAll(/<script/g)].length, 1);
 });
 

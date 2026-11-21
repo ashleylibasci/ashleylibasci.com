@@ -173,8 +173,13 @@ test('next tap: the dog hops back, facing the other way', () => {
   assert.equal(plays.length, 2);
   assert.match(plays[1]?.frames[0]?.transform ?? '', /^translate\(66px,0px\) rotate\(0deg\) scale\(-1,1\)$/);
   assert.match(lastFrame(plays[1]?.frames ?? []), /^translate\(0px,0px\) rotate\(0deg\) scale\(-1,1\)$/);
+  assert.equal(plays[0]?.cancelled, false, 'the first hop holds the dog through the delay');
+  clock.tick(HOP_TOTAL - 1);
+  assert.equal(plays[0]?.cancelled, false);
+  clock.tick(1);
   assert.equal(plays[0]?.cancelled, true, 'only the newest hop is held');
-  clock.tick(HOP_TOTAL + 5000);
+  assert.equal(plays[1]?.cancelled, false);
+  clock.tick(5000);
   dog.tap();
   assert.deepEqual(plays[2]?.frames, hopFrames(0));
 });
@@ -463,6 +468,12 @@ test('styles: wag, focus ring on either drawing, dark sleep, still z and the pho
   assert.match(source, /:global\(:root\[data-theme='dark'\]\) \.dog-egg:not\(\.awake\) \.dog \{\s*visibility: hidden;/);
   assert.match(source, /@media \(prefers-reduced-motion: reduce\) \{\s*\.zz i:first-child \{\s*opacity: 0\.6;\s*transform: translate\(3px, -6px\);/);
   assert.match(source, /@media \(max-width: 760px\) \{\s*\.dog-egg::after \{[^}]*height: 44px;/);
+});
+
+test('plays hold the end forwards only, so a delayed hop never shows its first frame early', () => {
+  const script = read('islands', 'footer-dog', 'footer-dog.ts');
+  assert.match(script, /dog\.animate\(frames, \{ \.\.\.options, fill: 'forwards' \}\)/);
+  assert.equal(/fill: 'both'|fill: 'backwards'/.test(script), false);
 });
 
 test('the client script imports nothing outside its own folder', () => {

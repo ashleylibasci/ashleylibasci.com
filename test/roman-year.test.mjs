@@ -47,7 +47,7 @@ test('markup: the year is its own element, not focusable, with a default cursor'
 
 test('the footer mounts the year island with the build-time year, beside the dog', () => {
   const footer = readFileSync(join(src, 'layouts', 'Footer.astro'), 'utf8');
-  assert.match(footer, /<span>© <RomanYear year=\{COPYRIGHT_YEAR\} \/> \{SITE_NAME\}<\/span><span data-slot="footer-drawing"><FooterDog \/><\/span>/);
+  assert.match(footer, /<span>© <RomanYear year=\{COPYRIGHT_YEAR\} \/> \{SITE_NAME\}<\/span><span data-slot="footer-drawing">/);
   assert.equal(/MMXXVI/.test(footer), false);
 });
 

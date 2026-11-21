@@ -182,7 +182,10 @@ export interface Stage {
   /** Room for the run, from the dog's left edge. */
   free(): number;
   hurdle(up: boolean): void;
-  /** Plays on the dog and holds the last frame; calls `finished` once at the end. */
+  /**
+   * Plays on the dog and holds the last frame (not the first through a delay);
+   * calls `finished` once at the end.
+   */
   play(frames: Frame[], options: PlayOptions, finished?: () => void): Played;
   /** Drops every animation on the dog. */
   stop(): void;
@@ -248,6 +251,9 @@ export function createDog(stage: Stage, clock: Clock): Dog {
       hopFrames(side),
       { duration: HOP_MS, delay: HOP_DELAY_MS, easing: 'ease-in-out' },
       () => {
+        // The last hop stays held until this one ends, so the dog keeps its
+        // place and facing through the delay; then only this one is held.
+        before?.cancel();
         if (held !== playing) return;
         side = side ? 0 : 1;
         busy = false;
@@ -255,7 +261,6 @@ export function createDog(stage: Stage, clock: Clock): Dog {
       },
     );
     held = playing;
-    before?.cancel();
   };
 
   const done = (): void => {

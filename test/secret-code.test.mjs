@@ -82,6 +82,16 @@ test('capital B and A: Shift+B, Shift+A at the end triggers, bare Shift ignored'
   assert.deepEqual(feed(createMatcher(), keys), [11]);
 });
 
+test('bare CapsLock before B A: ignored, the code triggers', () => {
+  const keys = [...KEYS.slice(0, 8), 'CapsLock', 'B', 'A'];
+  assert.deepEqual(feed(createMatcher(), keys), [10]);
+});
+
+test('bare AltGraph before b a: ignored, the code triggers', () => {
+  const keys = [...KEYS.slice(0, 8), 'AltGraph', 'b', 'a'];
+  assert.deepEqual(feed(createMatcher(), keys), [10]);
+});
+
 test('Ctrl, Alt or Meta held: ignored, the sequence still waits for A', () => {
   for (const mod of ['ctrlKey', 'altKey', 'metaKey']) {
     const keys = [...KEYS.slice(0, 9), { key: 'a', [mod]: true }, 'a'];

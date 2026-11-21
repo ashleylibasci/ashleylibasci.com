@@ -24,7 +24,7 @@ export const STILL_CLEAR_MS = 2400;
 /** Input types that take no typing, so the code still counts on them. */
 const NOT_TYPING = /^(radio|checkbox|button|submit|reset|range|color|file|image)$/i;
 /** Keys that neither advance nor reset the sequence when pressed alone. */
-const BARE_MODIFIERS = new Set(['Shift', 'Control', 'Alt', 'Meta']);
+const BARE_MODIFIERS = new Set(['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'AltGraph']);
 
 export interface TargetLike {
   tagName?: string;
