@@ -9,6 +9,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "check": "astro check",
+    "check:links": "node scripts/links/check-links.mjs",
+    "check:redirects": "node scripts/redirects/check-redirects.mjs",
     "preview": "astro preview",
     "guard": "node --env-file-if-exists=.env scripts/guard/guard.mjs",
     "test": "node --test \"test/**/*.test.mjs\""
@@ -19,6 +22,8 @@
     "astro": "7.4.12"
   },
   "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@types/node": "24.19.2",
     "typescript": "^6.0.3",
     "unpdf": "2.1.0"
   }

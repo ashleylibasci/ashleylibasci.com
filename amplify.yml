@@ -10,7 +10,10 @@ frontend:
     build:
       commands:
         - npm test
+        - npm run check
         - npm run build
+        - npm run check:links
+        - npm run check:redirects
         - npm run guard
   artifacts:
     baseDirectory: dist
