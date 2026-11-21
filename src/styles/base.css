@@ -125,6 +125,70 @@ a:hover {
   }
 }
 
+/* Twelve-column grid for page content; one column at 760px and below. */
+.g12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--space-column-gap);
+}
+
+/* Article wrapper for inner pages: sections split by a hairline, heading left, text right. */
+.art {
+  padding-top: var(--space-5);
+  padding-bottom: var(--space-8);
+}
+
+.art > section {
+  padding: var(--space-7) 0;
+  border-top: 1px solid var(--color-line);
+  align-items: start;
+}
+
+.art > section:first-child {
+  border-top: 0;
+  padding-top: var(--space-4);
+}
+
+.art > section > h2 {
+  grid-column: 1 / 4;
+  font: var(--type-article-heading);
+  padding-right: var(--space-4);
+  margin-top: -3px;
+}
+
+.col {
+  grid-column: 4 / 11;
+  min-width: 0;
+}
+
+.col > p {
+  max-width: 40em;
+}
+
+.col > p + p {
+  margin-top: var(--space-3);
+}
+
+/* Figures that line up in columns. */
+.num {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@media (max-width: 760px) {
+  .g12 {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+  }
+
+  .g12 > * {
+    grid-column: 1 / -1 !important;
+  }
+
+  .art > section > h2 {
+    margin-bottom: var(--space-3);
+  }
+}
+
 /* Skip link: off-screen until focused. */
 .skip {
   position: absolute;

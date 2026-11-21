@@ -9,4 +9,14 @@ export interface NavItem {
   tab: boolean;
 }
 
-export const NAV: readonly NavItem[] = [{ key: 'home', label: 'Home', href: '/', tab: false }];
+export const NAV: readonly NavItem[] = [
+  { key: 'home', label: 'Home', href: '/', tab: false },
+  { key: 'experience', label: 'Experience', href: '/experience', tab: true },
+];
+
+/** The nav item for a key; throws on a key that is not in NAV. */
+export function navItem(key: string): NavItem {
+  const item = NAV.find((entry) => entry.key === key);
+  if (!item) throw new Error(`nav: no item "${key}"`);
+  return item;
+}

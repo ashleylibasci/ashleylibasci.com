@@ -1,0 +1,16 @@
+kind: education
+school: University of Illinois Urbana-Champaign
+degree: B.S. Math and Computer Science
+minor: Statistics
+start: 2025-08-01
+end: 2028-05-01
+gpa: 3.88
+gpaScale: 4.00
+coursework:
+  - Data Structures
+  - Computational Linear Algebra
+  - Discrete Structures
+  - Intro to Higher Mathematics Honors
+  - Intro to CS I Honors (Kotlin) and II
+  - Data Science Discovery & Exploration (Python)
+  - Calc III

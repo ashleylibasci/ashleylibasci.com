@@ -1,0 +1,86 @@
+---
+// A dated row: the date on the left, then title, organization and description.
+// The default slot takes extra lines under the organization (the Education block).
+import { formatRange } from '../lib/format';
+
+interface Props {
+  title: string;
+  org: string;
+  description?: string;
+  start?: Date;
+  end?: Date;
+  /** A link shown after the description; pass it only when the page exists. */
+  link?: { href: string; label: string };
+  /** Wrapper element: a list item by default. */
+  as?: 'li' | 'div';
+  /** Heading level of the title. */
+  level?: 2 | 3;
+}
+
+const { title, org, description, start, end, link, as: Row = 'li', level = 2 } = Astro.props;
+const Heading = `h${level}` as const;
+---
+<Row class="entry g12">
+  <p class="when">{formatRange(start, end)}</p>
+  <div class="what">
+    <Heading class="title">{title}</Heading>
+    <p class="org">{org}</p>
+    {
+      description && (
+        <p class="d">
+          {description}{link && <Fragment> <a href={link.href}>{link.label}</a></Fragment>}
+        </p>
+      )
+    }
+    <slot />
+  </div>
+</Row>
+
+<style>
+  .entry {
+    padding: var(--space-5) 0;
+    border-top: 1px solid var(--color-line);
+    align-items: start;
+  }
+
+  .entry:first-child {
+    border-top: 0;
+  }
+
+  .when {
+    grid-column: 1 / 4;
+    color: var(--color-ink-3);
+    font: var(--type-ui);
+    padding-top: 5px;
+  }
+
+  .what {
+    grid-column: 4 / 11;
+    min-width: 0;
+  }
+
+  .title {
+    font: var(--type-experience-title);
+    margin-top: -3px;
+    padding-right: var(--space-4);
+  }
+
+  .org {
+    color: var(--color-ink-2);
+  }
+
+  .d {
+    margin-top: var(--space-2);
+    max-width: 42em;
+  }
+
+  @media (max-width: 760px) {
+    .when {
+      margin-bottom: var(--space-1);
+    }
+
+    .title {
+      margin-bottom: var(--space-3);
+    }
+  }
+</style>

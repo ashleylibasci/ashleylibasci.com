@@ -1,0 +1,71 @@
+---
+// Page head for inner pages: breadcrumb, title, standfirst and an optional row of links.
+// The title is the skip-link and page-load focus target.
+import { routeExists } from '../lib/routes';
+
+interface Props {
+  title: string;
+  standfirst: string;
+  /** Breadcrumb steps before this page, first to last. */
+  crumbs?: readonly { label: string; href: string }[];
+}
+
+const { title, standfirst, crumbs = [] } = Astro.props;
+// Rendered first so a links slot that comes out empty adds no row and no gap.
+const links = Astro.slots.has('links') ? (await Astro.slots.render('links')).trim() : '';
+---
+<div class="wrap phead">
+  <nav class="crumb" aria-label="Breadcrumb">
+    {
+      crumbs.map((step) => (
+        <Fragment>
+          {routeExists(step.href) ? <a href={step.href}>{step.label}</a> : <span>{step.label}</span>}
+          {' / '}
+        </Fragment>
+      ))
+    }<span>{title}</span>
+  </nav>
+  <h1 id="page-heading" tabindex="-1">{title}</h1>
+  <p class="standfirst">{standfirst}</p>
+  {links && <p class="links" set:html={links} />}
+</div>
+
+<style>
+  .phead {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-6);
+  }
+
+  .crumb {
+    font: var(--type-label);
+    color: var(--color-ink-3);
+  }
+
+  .crumb a {
+    color: var(--color-ink-3);
+  }
+
+  .crumb a:hover {
+    color: var(--color-ink);
+  }
+
+  h1 {
+    margin-top: var(--space-3);
+    font: var(--type-page-title);
+  }
+
+  .standfirst {
+    margin-top: var(--space-4);
+    font: var(--type-standfirst);
+    max-width: 38em;
+    color: var(--color-ink-2);
+  }
+
+  .links {
+    margin-top: var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    font: var(--type-ui);
+  }
+</style>

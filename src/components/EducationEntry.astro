@@ -1,0 +1,54 @@
+---
+// The Education block: a dated row with degree and minor, GPA and a wrapped coursework list.
+import ExperienceEntry from './ExperienceEntry.astro';
+
+interface Props {
+  school: string;
+  degree: string;
+  minor: string;
+  start: Date;
+  end: Date;
+  gpa: number;
+  gpaScale: number;
+  coursework: readonly string[];
+}
+
+const { school, degree, minor, start, end, gpa, gpaScale, coursework } = Astro.props;
+---
+<ExperienceEntry as="div" level={3} title={school} org={`${degree}, minor in ${minor}`} start={start} end={end}>
+  <p class="gpa num">GPA {gpa.toFixed(2)} / {gpaScale.toFixed(2)}</p>
+  <div class="course">
+    <h4>Coursework</h4>
+    <ul>
+      {coursework.map((course) => <li>{course}</li>)}
+    </ul>
+  </div>
+</ExperienceEntry>
+
+<style>
+  .gpa {
+    margin-top: var(--space-2);
+    color: var(--color-ink-2);
+  }
+
+  .course {
+    margin-top: var(--space-4);
+  }
+
+  h4 {
+    font: var(--type-subhead);
+    color: var(--color-ink-2);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    max-width: 42em;
+    font: var(--type-ui);
+    color: var(--color-ink-2);
+  }
+</style>

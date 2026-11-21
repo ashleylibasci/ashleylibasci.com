@@ -1,0 +1,6 @@
+kind: experience
+title: Career Star
+org: 'Personal project, {status}'
+description: A risk-adjusted score for about 730 occupations from O*NET data, with robustness checks, a 35-test automated suite and CI through GitHub.
+project: career-star
+linkLabel: The case study

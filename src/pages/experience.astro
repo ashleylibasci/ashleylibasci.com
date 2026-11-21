@@ -1,0 +1,117 @@
+---
+// Experience: every entry newest first, then Education. All facts come from the
+// experience and projects collections; dates become words in src/lib/format.ts.
+import { getCollection, getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import EducationEntry from '../components/EducationEntry.astro';
+import ExperienceEntry from '../components/ExperienceEntry.astro';
+import PageHead from '../components/PageHead.astro';
+import { entryFacts } from '../lib/content-rules';
+import { fillTemplate, formatYear } from '../lib/format';
+import { navItem } from '../lib/nav';
+import { routeExists } from '../lib/routes';
+
+const page = navItem('experience');
+const home = navItem('home');
+const resumeHref = '/about#resume';
+
+const all = await getCollection('experience');
+const newestFirst = (a: { start?: Date }, b: { start?: Date }) =>
+  (b.start?.getTime() ?? Infinity) - (a.start?.getTime() ?? Infinity);
+
+// An entry that names a project takes its dates, and its link target, from the project.
+const entries = (
+  await Promise.all(
+    all.map(async ({ id, data }) => {
+      if (data.kind !== 'experience') return [];
+      const project = data.project && (await getEntry(data.project));
+      if (data.project && !project) throw new Error(`experience/${id}: no project "${data.project.id}"`);
+      if (!data.title) throw new Error(`experience/${id}: no title`);
+      const facts = entryFacts(data, project?.data);
+      return [
+        {
+          id,
+          title: data.title,
+          org: project ? fillTemplate(data.org, project.data) : data.org,
+          description: data.description,
+          start: facts.start,
+          end: facts.end,
+          link:
+            facts.href && data.linkLabel && routeExists(facts.href)
+              ? { href: facts.href, label: data.linkLabel }
+              : undefined,
+        },
+      ];
+    }),
+  )
+)
+  .flat()
+  .sort(newestFirst);
+
+const education = all.flatMap(({ id, data }) => (data.kind === 'education' ? [{ id, ...data }] : [])).sort(newestFirst);
+
+const starts = [...entries, ...education].flatMap((entry) => (entry.start ? [entry.start] : []));
+if (starts.length === 0) throw new Error('experience: no dated entry');
+const earliest = new Date(Math.min(...starts.map((start) => start.getTime())));
+---
+<Base title={page.label} section={page.key}>
+  <PageHead
+    title={page.label}
+    standfirst={`Everything since ${formatYear(earliest)}, newest first.`}
+    crumbs={[{ label: home.label, href: home.href }]}
+  >
+    <Fragment slot="links">{routeExists(resumeHref) && <a href={resumeHref}>Resume</a>}</Fragment>
+  </PageHead>
+  <div class="wrap art">
+    <ol class="entries">
+      {
+        entries.map((entry) => (
+          <ExperienceEntry
+            title={entry.title}
+            org={entry.org}
+            description={entry.description}
+            start={entry.start}
+            end={entry.end}
+            link={entry.link}
+          />
+        ))
+      }
+    </ol>
+    <section aria-labelledby="education-heading">
+      <h2 id="education-heading">Education</h2>
+      <div class="school">
+        {
+          education.map((entry) => (
+            <EducationEntry
+              school={entry.school}
+              degree={entry.degree}
+              minor={entry.minor}
+              start={entry.start}
+              end={entry.end}
+              gpa={entry.gpa}
+              gpaScale={entry.gpaScale}
+              coursework={entry.coursework}
+            />
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .entries {
+    list-style: none;
+    padding: 0;
+  }
+
+  section > h2 {
+    margin-bottom: var(--space-3);
+  }
+
+  /* The first school sits closer to the heading than a list row would. */
+  .school > :global(.entry:first-child) {
+    padding-top: var(--space-3);
+    padding-bottom: 0;
+  }
+</style>
