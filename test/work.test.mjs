@@ -245,12 +245,14 @@ test('images go through FramedImage, lazy, with alt text', () => {
   assert.equal(page.match(/alt: '[^']+'/g)?.length, 5);
 });
 
-test('no hover lift, no border change on hover and no client script', () => {
-  for (const source of [page, entry, visual]) {
-    assert.equal(/transform|transition/.test(source), false);
+test('only the visual lifts on hover, in translate, and there is no client script', () => {
+  // The visual's lift and darker hairline are checked in hover-touches.test.mjs.
+  for (const source of [page, entry]) {
+    assert.equal(/transform|transition|translate/.test(source), false);
     assert.equal(/:hover[^{]*\{[^}]*border/.test(source), false);
-    assert.equal(/<script/.test(source), false);
   }
+  assert.equal(/transform/.test(visual), false);
+  for (const source of [page, entry, visual]) assert.equal(/<script/.test(source), false);
   assert.match(entry, /h2 a:hover \{[^}]*text-decoration-color: var\(--color-aqua\)/);
 });
 

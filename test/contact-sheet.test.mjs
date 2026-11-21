@@ -190,11 +190,11 @@ test('the typeset print keeps fixed colors and is hidden inside its link', () =>
   }
 });
 
-test('no hover lift and no border change on hover', () => {
-  for (const source of [sheet, print]) {
-    assert.equal(/transform/.test(source), false);
-    assert.equal(/:hover[^{]*\{[^}]*border/.test(source), false);
-  }
+test('the sheet adds no hover lift of its own; the print keeps its lift in translate', () => {
+  // The lift and darker hairline on the print are checked in hover-touches.test.mjs.
+  assert.equal(/transform|translate/.test(sheet), false);
+  assert.equal(/:hover[^{]*\{[^}]*border/.test(sheet), false);
+  assert.equal(/transform/.test(print), false);
 });
 
 test('four across from 761px, two across at 760px and below', () => {

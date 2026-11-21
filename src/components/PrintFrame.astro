@@ -20,6 +20,21 @@ const { class: className, ...rest } = Astro.props;
     padding: 10px;
     border: 1px solid var(--color-print-line);
     border-radius: var(--radius-print);
+    transition:
+      translate var(--t) var(--ease),
+      border-color var(--t) ease-out;
+  }
+
+  /* On hover the print lifts 2px and its hairline darkens. */
+  .print-frame:hover {
+    translate: 0 -2px;
+    border-color: var(--color-print-line-hover);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .print-frame:hover {
+      translate: none;
+    }
   }
 
   @media (max-width: 760px) {

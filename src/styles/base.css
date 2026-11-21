@@ -3,6 +3,7 @@
 :root {
   --ease: cubic-bezier(0.2, 0.7, 0.25, 1);
   --t: 0.2s;
+  --t-sweep: 0.32s;
   --nav: var(--space-nav-height);
 }
 
@@ -236,6 +237,30 @@ a:hover {
     align-items: center;
     min-height: 44px;
   }
+}
+
+/* Primary button: the Resume sweep. A thin underline grows in from the left on hover and
+   keyboard focus. Under reduced motion it shows at full width at once. */
+.btn {
+  position: relative;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: 9px;
+  height: 1px;
+  background: var(--color-button-underline);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform var(--t-sweep) var(--ease);
+}
+
+.btn:hover::after,
+.btn:focus-visible::after {
+  transform: scaleX(1);
 }
 
 /* Reserved slots for later features add no gap while empty. */

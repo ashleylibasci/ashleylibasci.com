@@ -83,6 +83,21 @@ const picture = image ? printImage(image.width, image.height) : null;
     padding: 7px;
     border: 1px solid var(--color-print-line);
     border-radius: var(--radius-print);
+    transition:
+      translate var(--t) var(--ease),
+      border-color var(--t) ease-out;
+  }
+
+  /* On hover the print lifts 2px and its hairline darkens. */
+  a.fr:hover .pr {
+    translate: 0 -2px;
+    border-color: var(--color-ink-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    a.fr:hover .pr {
+      translate: none;
+    }
   }
 
   .im {

@@ -112,6 +112,9 @@ const share = (value: number) => Math.round(value * 1000) / 1000;
     border-radius: var(--radius-lg);
     color: var(--color-ink);
     text-decoration: none;
+    transition:
+      translate var(--t) var(--ease),
+      border-color var(--t) ease-out;
   }
 
   .wv::before {
@@ -120,8 +123,17 @@ const share = (value: number) => Math.round(value * 1000) / 1000;
     padding-top: 52.5%;
   }
 
+  /* On hover the visual lifts 2px and its hairline darkens. */
   a.wv:hover {
     color: var(--color-ink);
+    translate: 0 -2px;
+    border-color: var(--color-line-2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    a.wv:hover {
+      translate: none;
+    }
   }
 
   a.wv:focus-visible {
