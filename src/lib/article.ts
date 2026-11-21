@@ -1,6 +1,6 @@
 // Splits the HTML of a Markdown write-up into the parts an inner page lays out: the lead
-// before the first h2, then one section per h2. Inside a section, a paragraph that starts
-// with [[figure:name]] is a figure, and the rest of that paragraph is its caption.
+// before the first h2, then one section per h2. In the lead or a section, a paragraph that
+// starts with [[figure:name]] is a figure, and the rest of that paragraph is its caption.
 // Pure and type-erasable: the tests import this file directly, so no Astro imports and no enums.
 
 export type ArticlePart =
@@ -16,7 +16,10 @@ export interface ArticleSection {
 }
 
 export interface Article {
+  /** The lead's HTML, without its figures. */
   lead: string;
+  /** The lead in order, figures included. */
+  leadParts: ArticlePart[];
   sections: ArticleSection[];
 }
 
@@ -63,20 +66,21 @@ function parts(body: string, where: string): ArticlePart[] {
 /** The lead and the sections of a write-up. Without an h2, all of it is the lead. */
 export function splitArticle(html: string): Article {
   const headings = [...html.matchAll(H2)];
-  const lead = plain(html.slice(0, headings[0]?.index ?? html.length), 'the lead');
+  const leadParts = parts(html.slice(0, headings[0]?.index ?? html.length), 'the lead');
+  const lead = leadParts.flatMap((part) => (part.kind === 'html' ? [part.html] : [])).join('\n');
   const sections = headings.map((match, index) => {
     const heading = match[2].trim();
     const id = match[1]?.match(/\sid="([^"]+)"/)?.[1] ?? slug(heading);
     const body = html.slice(match.index + match[0].length, headings[index + 1]?.index ?? html.length);
     return { id, heading, parts: parts(body, `the section "${id}"`) };
   });
-  return { lead, sections };
+  return { lead, leadParts, sections };
 }
 
-/** The names of the figures a write-up places, in order. */
+/** The names of the figures a write-up places, in order: the lead's, then each section's. */
 export function figureNames(article: Article): string[] {
-  return article.sections.flatMap((section) =>
-    section.parts.flatMap((part) => (part.kind === 'figure' ? [part.name] : [])),
+  return [article.leadParts, ...article.sections.map((section) => section.parts)].flatMap((parts) =>
+    parts.flatMap((part) => (part.kind === 'figure' ? [part.name] : [])),
   );
 }
 

@@ -53,6 +53,7 @@ const article = splitArticle(html);
 if (!article.lead) throw new Error(`${ID}: the write-up has no lead before its first heading`);
 // An unknown figure name, or a figure the write-up never uses, fails the build.
 checkFigures(article, Object.keys(FIGURES), ID);
+if (article.leadParts.some((part) => part.kind === 'figure')) throw new Error(`${ID}: the lead places a figure`);
 
 const sections = article.sections.map((section) => {
   const parts = section.parts.map((part) => (part.kind === 'figure' ? { ...part, ...FIGURES[part.name] } : part));

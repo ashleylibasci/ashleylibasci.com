@@ -18,6 +18,7 @@ const HTML = [
 test('a lead, two h2 and a figure paragraph: the lead, then sections with ordered parts', () => {
   assert.deepEqual(splitArticle(HTML), {
     lead: '<p>The lead.</p>\n<dl><dt>Status</dt><dd>Open</dd></dl>',
+    leadParts: [{ kind: 'html', html: '<p>The lead.</p>\n<dl><dt>Status</dt><dd>Open</dd></dl>' }],
     sections: [
       {
         id: 'the-first',
@@ -40,9 +41,10 @@ test('a lead, two h2 and a figure paragraph: the lead, then sections with ordere
 test('without an h2, all of it is the lead and there are no sections', () => {
   assert.deepEqual(splitArticle('<p>One.</p>\n<h3>Not a section</h3>\n<p>Two.</p>\n'), {
     lead: '<p>One.</p>\n<h3>Not a section</h3>\n<p>Two.</p>',
+    leadParts: [{ kind: 'html', html: '<p>One.</p>\n<h3>Not a section</h3>\n<p>Two.</p>' }],
     sections: [],
   });
-  assert.deepEqual(splitArticle(''), { lead: '', sections: [] });
+  assert.deepEqual(splitArticle(''), { lead: '', leadParts: [], sections: [] });
 });
 
 test('a section may hold only a figure, or nothing', () => {
@@ -53,8 +55,22 @@ test('a section may hold only a figure, or nothing', () => {
 
 test('a marker that does not start its own paragraph throws, naming where', () => {
   assert.throws(() => splitArticle('<h2 id="a">A</h2><p>See [[figure:one]] here.</p>'), /article: .*the section "a"/);
-  assert.throws(() => splitArticle('<p>[[figure:one]] early</p><h2 id="a">A</h2>'), /article: .*the lead/);
+  assert.throws(() => splitArticle('<p>See [[figure:one]] here.</p><h2 id="a">A</h2>'), /article: .*the lead/);
   assert.throws(() => splitArticle('<h2 id="a">A</h2><p>[[figure:Bad Name]] x</p>'), /article: "Bad Name" .*is not a figure name/);
+});
+
+test('the lead may place a figure: it is a lead part, and not in the lead HTML', () => {
+  const article = splitArticle('<p>Lead.</p>\n<p>[[figure:shot]] Cap.</p>\n<h2>A</h2><p>[[figure:chart]] x</p>');
+  assert.equal(article.lead, '<p>Lead.</p>');
+  assert.deepEqual(article.leadParts, [
+    { kind: 'html', html: '<p>Lead.</p>' },
+    { kind: 'figure', name: 'shot', caption: 'Cap.' },
+  ]);
+  assert.deepEqual(figureNames(article), ['shot', 'chart']);
+  // The lead's figures count for the unknown and unused rules.
+  assert.throws(() => checkFigures(article, ['chart'], 'the-page'), /the-page: .*unknown figure "shot"/);
+  assert.throws(() => checkFigures(splitArticle('<p>Lead.</p><h2>A</h2>'), ['shot'], 'the-page'), /never uses the figure "shot"/);
+  assert.doesNotThrow(() => checkFigures(article, ['shot', 'chart'], 'the-page'));
 });
 
 test('figureNames lists the figures in order', () => {

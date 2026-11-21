@@ -1,11 +1,12 @@
 ---
 // Page head for inner pages: breadcrumb, title, standfirst and an optional row of links.
+// The standfirst is the `standfirst` text or, for Markdown HTML, the `standfirst` slot.
 // The title is the skip-link and page-load focus target.
 import { routeExists } from '../lib/routes';
 
 interface Props {
   title: string;
-  standfirst: string;
+  standfirst?: string;
   /** Breadcrumb steps before this page, first to last. */
   crumbs?: readonly { label: string; href: string }[];
 }
@@ -26,7 +27,7 @@ const links = Astro.slots.has('links') ? (await Astro.slots.render('links')).tri
     }<span>{title}</span>
   </nav>
   <h1 id="page-heading" tabindex="-1">{title}</h1>
-  <p class="standfirst">{standfirst}</p>
+  <p class="standfirst"><slot name="standfirst">{standfirst}</slot></p>
   {links && <p class="links" set:html={links} />}
 </div>
 

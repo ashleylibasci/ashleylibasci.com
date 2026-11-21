@@ -3,7 +3,8 @@
 // (default slot) and, when given, a wide block in columns 4 to 12 under it (`wide` slot).
 // Goes inside `.wrap.art`, which base.css lays out. The text is Markdown HTML and carries no
 // scope attribute, so the styles for what it holds (subheads, the Feature list `dl.feat`,
-// the Facts list `dl.facts`) are global, under `.art .col`.
+// the Facts list `dl.facts`, the Formula block `.math`, the Highlight `mark`, a plain list)
+// are global, under `.art`.
 interface Props {
   id: string;
   /** The heading's inner HTML, as the Markdown processor gives it. */
@@ -47,6 +48,57 @@ const wide = Astro.slots.has('wide') ? (await Astro.slots.render('wide')).trim()
   .art .col h3 + p {
     margin-top: var(--space-2);
     max-width: 40em;
+  }
+
+  .art .col .fig + p {
+    margin-top: var(--space-5);
+  }
+
+  /* Plain list: each item may open with a bold lead-in. */
+  .art .col > ul {
+    padding-left: 20px;
+    max-width: 42em;
+  }
+
+  .art .col > ul > li + li {
+    margin-top: var(--space-3);
+  }
+
+  .art .col > ul > li > strong:first-child {
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  /* Formula block: one formula a line, variable names in italic, an optional small note. */
+  .art .math {
+    margin-top: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    font: var(--type-formula);
+    /* The shorthand resets figures. */
+    font-variant-numeric: tabular-nums lining-nums;
+    max-width: 32em;
+  }
+
+  .art .math i {
+    font-style: italic;
+  }
+
+  .art .math .n {
+    margin-left: var(--space-2);
+    font: var(--type-meta);
+    color: var(--color-ink-3);
+  }
+
+  /* Highlight: the one key number of a page. It never wraps. */
+  .art mark {
+    white-space: nowrap;
+    background: var(--color-mark);
+    color: var(--color-mark-ink);
+    padding: 0 4px;
+    border-radius: var(--radius-print);
   }
 
   /* Feature list: a term in the heading face, its description beside it. */

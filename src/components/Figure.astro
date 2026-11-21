@@ -1,18 +1,21 @@
 ---
 // Figure: a drawing (default slot) over its caption (`caption` slot). `wide` sets the drawing
-// on a white slab; `maxWidth` caps a figure that sits in the text column.
+// on a white slab; `maxWidth` caps a figure that sits in the text column and `spaced` gives
+// it more room above.
 // The drawing is another component's SVG and the caption is Markdown HTML, so neither carries
 // this component's scope: the styles are global, under `.fig`. A chart draws with the shared
-// classes below (`ax`, `tick`, `base`, `ln`, `bar-a`, `sleep`, `settle`, `exam`; on text `lb`, `on`).
+// classes below (`ax`, `tick`, `base`, `ln`, `bar-a`, `bar-b`, `sleep`, `settle`, `exam`; on text
+// `lb`, `vb`, `on`).
 interface Props {
   wide?: boolean;
   /** In px. */
   maxWidth?: number;
+  spaced?: boolean;
 }
 
-const { wide = false, maxWidth } = Astro.props;
+const { wide = false, maxWidth, spaced = false } = Astro.props;
 ---
-<figure class:list={['fig', { wide }]} style={maxWidth ? `max-width:${maxWidth}px` : undefined}>
+<figure class:list={['fig', { wide, spaced }]} style={maxWidth ? `max-width:${maxWidth}px` : undefined}>
   {wide ? <div class="slab"><slot /></div> : <slot />}
   <figcaption class="cap"><slot name="caption" /></figcaption>
 </figure>
@@ -20,6 +23,10 @@ const { wide = false, maxWidth } = Astro.props;
 <style is:global>
   .fig {
     margin-top: var(--space-4);
+  }
+
+  .fig.spaced {
+    margin-top: var(--space-5);
   }
 
   .fig.wide {
@@ -62,6 +69,12 @@ const { wide = false, maxWidth } = Astro.props;
     font-weight: 500;
   }
 
+  /* The value beside the highlighted bar. */
+  .fig text.vb {
+    fill: var(--color-link);
+    font-weight: 500;
+  }
+
   /* Words on the sleep bar. */
   .fig text.on {
     fill: var(--color-print);
@@ -93,6 +106,10 @@ const { wide = false, maxWidth } = Astro.props;
   .fig .bar-a,
   .fig .settle {
     fill: var(--color-chart-a);
+  }
+
+  .fig .bar-b {
+    fill: var(--color-link);
   }
 
   .fig .sleep {

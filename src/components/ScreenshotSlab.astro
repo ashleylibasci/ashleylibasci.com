@@ -1,0 +1,62 @@
+---
+// Screenshot slab: the top of one tall screenshot on a pale slab of fixed height, cropped at
+// the bottom, over its caption (default slot). Spans the full row of an article section.
+// Still: no hover motion.
+import type { ImageMetadata } from 'astro';
+import FramedImage from './FramedImage.astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+}
+
+const { src, alt } = Astro.props;
+
+// The image fills the slab inside its padding and the page gutters, up to 860px.
+const SIZES = '(max-width: 760px) calc(100vw - 72px), (max-width: 1060px) calc(100vw - 160px), 860px';
+// 1x to 3x of those widths, never above the original.
+const widths = [...new Set([360, 640, 860, 1280, 1720].map((width) => Math.min(width, src.width)))];
+---
+<figure class="shot">
+  <div class="slab"><FramedImage src={src} alt={alt} widths={widths} sizes={SIZES} class="page" /></div>
+  <figcaption class="cap"><slot /></figcaption>
+</figure>
+
+<style>
+  .shot {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .slab {
+    height: 520px;
+    padding: var(--space-7) var(--space-7) 0;
+    overflow: hidden;
+    background: var(--color-field);
+    border-radius: var(--radius-lg);
+  }
+
+  .slab .page {
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    border-radius: 10px 10px 0 0;
+    /* A faint ring, so a white page keeps its edge on the slab. */
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 8%, transparent);
+  }
+
+  .cap {
+    margin-top: var(--space-2);
+    font: var(--type-meta);
+    color: var(--color-ink-3);
+  }
+
+  @media (max-width: 760px) {
+    /* A narrow image is shorter than the slab, so the slab ends where the image does. */
+    .slab {
+      height: auto;
+      max-height: 360px;
+      padding: var(--space-4) var(--space-4) 0;
+    }
+  }
+</style>

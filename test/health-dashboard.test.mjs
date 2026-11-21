@@ -152,10 +152,13 @@ test('no client script, no hover motion and no color value outside the tokens', 
   }
 });
 
-test('nothing of the later pages is built here', () => {
-  for (const name of ['ScreenshotSlab', 'FormulaBlock', 'Highlight', 'CodeBlock', 'CropFrame']) {
+test('nothing of the Research page is built here', () => {
+  for (const name of ['CodeBlock', 'CropFrame']) {
     assert.equal(existsSync(join(src, 'components', `${name}.astro`)), false);
   }
-  assert.equal(existsSync(join(src, 'pages', 'career-star.astro')), false);
   assert.equal(existsSync(join(src, 'pages', 'research.astro')), false);
+});
+
+test('a figure in the lead fails the build', () => {
+  assert.match(page, /if \(article\.leadParts\.some\(\(part\) => part\.kind === 'figure'\)\) throw new Error\(/);
 });

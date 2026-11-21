@@ -1,0 +1,106 @@
+---
+// Career Star case study. Every sentence of the write-up is the Markdown body of the project
+// entry, placed by position: the lead is the standfirst and then the screenshot's figure
+// paragraph, each heading opens an Article section, and a [[figure:name]] paragraph is a
+// figure with its caption. Every Career Star address is built from the entry's `liveUrl`.
+// The schema carries no image fields, so the screenshot and its alt text are mapped here.
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ArticleSection from '../components/ArticleSection.astro';
+import Figure from '../components/Figure.astro';
+import PageHead from '../components/PageHead.astro';
+import ScreenshotSlab from '../components/ScreenshotSlab.astro';
+import FlaggedChart from '../components/figures/FlaggedChart.astro';
+import { checkFigures, splitArticle } from '../lib/article';
+import { CONTACTS } from '../lib/contacts';
+import { navItem } from '../lib/nav';
+import careerRate from '../assets/careerstar-rate.png';
+
+const ID = 'career-star';
+
+// The pictures the write-up places by name: the screenshot in the lead, the chart in the text.
+const SHOT_NAME = 'rating';
+const SHOT = {
+  image: careerRate,
+  alt: 'Career Star rating page for registered nurses: 75 out of 100, top tier, with Return 78, Resilience 69 and Fit 100, and the bull and bear case.',
+};
+const CHARTS: Record<string, { chart: typeof FlaggedChart; maxWidth: number }> = {
+  flagged: { chart: FlaggedChart, maxWidth: 560 },
+};
+
+const LIVE_LABEL = 'Open the live app';
+const WRITE_UP_LABEL = 'Full write-up on the site';
+const WRITE_UP_PATH = '/case-study';
+const CODE_LABEL = 'Code on GitHub';
+
+const work = navItem('work');
+const home = navItem('home');
+
+const entry = await getEntry('projects', ID);
+if (!entry) throw new Error(`${ID}: the project entry is missing`);
+const html = entry.rendered?.html;
+if (!html?.trim()) throw new Error(`${ID}: the project entry has no write-up`);
+const liveUrl = entry.data.liveUrl;
+if (!liveUrl) throw new Error(`${ID}: the project entry has no liveUrl`);
+
+const article = splitArticle(html);
+// An unknown figure name, or a figure the write-up never uses, fails the build.
+checkFigures(article, [SHOT_NAME, ...Object.keys(CHARTS)], ID);
+
+// The lead is one standfirst paragraph, then the screenshot with its caption.
+const [first, second, ...more] = article.leadParts;
+const standfirst = first?.kind === 'html' ? first.html.match(/^<p>((?:(?!<\/?p[\s>])[\s\S])*)<\/p>$/)?.[1] : undefined;
+if (!standfirst || second?.kind !== 'figure' || second.name !== SHOT_NAME || more.length > 0) {
+  throw new Error(`${ID}: the lead must be one standfirst paragraph, then [[figure:${SHOT_NAME}]] with its caption`);
+}
+const shotCaption = second.caption;
+
+const sections = article.sections.map((section) => ({
+  ...section,
+  parts: section.parts.map((part) => {
+    if (part.kind === 'html') return part;
+    const chart = CHARTS[part.name];
+    if (!chart) throw new Error(`${ID}: the figure "${part.name}" belongs in the lead`);
+    return { ...part, ...chart };
+  }),
+}));
+
+const links = [
+  { href: liveUrl, label: LIVE_LABEL },
+  { href: new URL(WRITE_UP_PATH, liveUrl).href, label: WRITE_UP_LABEL },
+  { href: CONTACTS.github, label: CODE_LABEL },
+];
+---
+<Base title={entry.data.title} section={work.key}>
+  <PageHead
+    title={entry.data.title}
+    crumbs={[
+      { label: home.label, href: home.href },
+      { label: work.label, href: work.href },
+    ]}
+  >
+    <Fragment slot="standfirst" set:html={standfirst} />
+    <Fragment slot="links">{links.map((link) => <a href={link.href}>{link.label}</a>)}</Fragment>
+  </PageHead>
+  <div class="wrap art">
+    <section class="g12">
+      <ScreenshotSlab src={SHOT.image} alt={SHOT.alt}><Fragment set:html={shotCaption} /></ScreenshotSlab>
+    </section>
+    {
+      sections.map((section) => (
+        <ArticleSection id={section.id} heading={section.heading}>
+          {section.parts.map((part) =>
+            part.kind === 'html' ? (
+              <Fragment set:html={part.html} />
+            ) : (
+              <Figure maxWidth={part.maxWidth} spaced>
+                <part.chart />
+                <Fragment slot="caption" set:html={part.caption} />
+              </Figure>
+            ),
+          )}
+        </ArticleSection>
+      ))
+    }
+  </div>
+</Base>
