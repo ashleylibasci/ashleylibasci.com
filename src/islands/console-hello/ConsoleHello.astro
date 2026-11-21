@@ -1,0 +1,15 @@
+---
+// A note in the browser console, once per page load (AD-5 island). The link
+// comes in as a prop, so this island imports nothing from src/lib. The carrier
+// is hidden and holds the link as data only, never as an href.
+interface Props {
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+<span hidden data-console-hello data-href={href}></span>
+
+<script>
+  import './console-hello.ts';
+</script>

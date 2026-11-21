@@ -210,7 +210,7 @@ test('Base mounts the code once, after page-focus, and keeps one inline script',
   const base = read('layouts', 'Base.astro');
   assert.match(base, /import SecretCode from '\.\.\/islands\/secret-code\/SecretCode\.astro';/);
   assert.equal([...base.matchAll(/<SecretCode \/>/g)].length, 1);
-  assert.match(base, /<PageFocus \/>\s*<SecretCode \/>\s*<\/body>/);
+  assert.match(base, /<PageFocus \/>\s*<SecretCode \/>/);
   assert.equal([...base.matchAll(/<script/g)].length, 1);
 });
 
