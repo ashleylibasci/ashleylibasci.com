@@ -1,0 +1,20 @@
+---
+// The footer year (AD-5 island). The year comes in as a prop, so this island
+// imports nothing from src/lib. Without the script it is the plain year.
+interface Props {
+  year: string;
+}
+
+const { year } = Astro.props;
+---
+<span class="cy" data-roman-year>{year}</span>
+
+<script>
+  import './roman-year.ts';
+</script>
+
+<style>
+  .cy {
+    cursor: default;
+  }
+</style>

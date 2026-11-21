@@ -124,11 +124,74 @@ test('no JavaScript: the markup is the default answer, worked out from the core'
   assert.equal(words(answer.bed), '11:15 p.m.');
 });
 
-test('the heartbeat line is decoration: hidden from assistive technology, never focusable', () => {
+test('the heartbeat line: the SVG stays hidden, its wrapper is the one focus stop', () => {
   const component = read('HealthDemo.astro');
   const svg = component.match(/<svg[^>]*>/)?.[0] ?? '';
   assert.match(svg, /aria-hidden="true"/);
   assert.doesNotMatch(svg, /tabindex/);
+  const hit = component.match(/<div class="beat-hit"[^>]*>/)?.[0] ?? '';
+  assert.match(hit, /tabindex="0"/);
+  assert.match(hit, /role="img"/);
+  assert.match(hit, /aria-label="Heartbeat line"/);
+  assert.match(hit, /aria-describedby="hd-beat-f"/);
+  assert.match(component, /<div class="beat-hit"[^>]*>\s*<svg class="beat"/);
+});
+
+test('hidden math: the formula sits with the rule and reads as EXPERIENCE.md', () => {
+  const component = read('HealthDemo.astro');
+  const formula = component.match(/<p class="beat-f" id="hd-beat-f">(.*?)<\/p>/)?.[1] ?? '';
+  assert.equal(
+    formula,
+    '<i>f</i>(<i>t</i>) = 12 for <i>t</i> ≤ 186 and for <i>t</i> ≥ 290; between, straight lines through (208, 7), (238, 29) and (268, 2). Here <i>f</i> = 32 − <i>y</i>.',
+  );
+  assert.equal(
+    formula.replace(/<\/?i>/g, ''),
+    'f(t) = 12 for t ≤ 186 and for t ≥ 290; between, straight lines through (208, 7), (238, 29) and (268, 2). Here f = 32 − y.',
+  );
+  assert.match(component, /<div class="rule-wrap">\s*<p class="rule">[^<]*<\/p>\s*<p class="beat-f"/);
+  assert.equal([...component.matchAll(/id="hd-beat-f"/g)].length, 1);
+});
+
+test('hidden math: the formula\'s numbers are 32 − y of the trace path', () => {
+  const component = read('HealthDemo.astro');
+  const d = component.match(/<path class="trace"[^>]* d="([^"]+)"/)?.[1] ?? '';
+  assert.equal(d, 'M2 20 H186 L208 25 L238 3 L268 30 L290 20 H478');
+  /** @type {Map<number, number>} */
+  const vertices = new Map();
+  let y = 0;
+  for (const [, cmd, args] of d.matchAll(/([MHL])\s*([\d.\s]+)/g)) {
+    const nums = (args ?? '').trim().split(/\s+/).map(Number);
+    if (cmd === 'H') vertices.set(nums[0] ?? 0, y);
+    else {
+      y = nums[1] ?? 0;
+      vertices.set(nums[0] ?? 0, y);
+    }
+  }
+  const f = (/** @type {number} */ t) => 32 - (vertices.get(t) ?? Number.NaN);
+  assert.equal(f(186), 12);
+  assert.equal(f(290), 12);
+  assert.equal(f(2), 12);
+  assert.equal(f(478), 12);
+  const formula = component.match(/<p class="beat-f"[^>]*>(.*?)<\/p>/)?.[1] ?? '';
+  const points = [...formula.matchAll(/\((\d+), (\d+)\)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+  assert.deepEqual(points, [
+    [208, 7],
+    [238, 29],
+    [268, 2],
+  ]);
+  for (const [t, value] of points) assert.equal(f(t ?? 0), value, `t = ${t}`);
+  assert.match(formula, /= 12 for <i>t<\/i> ≤ 186 and for <i>t<\/i> ≥ 290;/);
+});
+
+test('hidden math styles: one grid cell, a --t fade on hover or focus, no script', () => {
+  const component = read('HealthDemo.astro');
+  assert.match(component, /\.rule-wrap \{\s*display: grid;/);
+  assert.match(component, /\.rule-wrap > \* \{\s*grid-area: 1 \/ 1;[^}]*opacity var\(--t\) ease-out,\s*visibility var\(--t\) ease-out;/);
+  assert.match(component, /\.beat-hit:hover ~ \.rule-wrap \.beat-f,\s*\.beat-hit:focus ~ \.rule-wrap \.beat-f \{\s*opacity: 1;\s*visibility: visible;/);
+  assert.match(component, /\.beat-hit:hover ~ \.rule-wrap \.rule,\s*\.beat-hit:focus ~ \.rule-wrap \.rule \{\s*opacity: 0;\s*visibility: hidden;/);
+  assert.match(component, /\.beat-hit:focus-visible \{\s*outline-offset: 2px;/);
+  assert.match(component, /\.beat \{\s*display: block;/);
+  assert.equal(/beat-f|rule-wrap|beat-hit/.test(read('health-demo.ts')), false, 'the swap needs no script');
 });
 
 test('the title and the Placard link are links only when the page exists', () => {

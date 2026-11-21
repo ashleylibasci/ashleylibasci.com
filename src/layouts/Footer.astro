@@ -1,11 +1,12 @@
 ---
 import { COPYRIGHT_YEAR, UPDATED_LABEL } from '../lib/build-time';
 import FooterDog from '../islands/footer-dog/FooterDog.astro';
+import RomanYear from '../islands/roman-year/RomanYear.astro';
 import { SITE_NAME } from '../lib/nav';
 ---
 <footer class="foot">
   <div class="wrap" data-dog-row>
-    <span class="cr"><span>© {COPYRIGHT_YEAR} {SITE_NAME}</span><span data-slot="footer-drawing"><FooterDog /></span></span>
+    <span class="cr"><span>© <RomanYear year={COPYRIGHT_YEAR} /> {SITE_NAME}</span><span data-slot="footer-drawing"><FooterDog /></span></span>
     <span>Updated {UPDATED_LABEL}</span>
   </div>
 </footer>

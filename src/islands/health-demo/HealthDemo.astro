@@ -69,10 +69,15 @@ const defaultCaption = SCREENS.find((screen) => screen.value === DEFAULT_SCREEN)
           ))}
         </div>
       </div>
-      <svg class="beat" viewBox="0 0 480 32" aria-hidden="true" focusable="false" preserveAspectRatio="none">
-        <path class="trace" data-trace pathLength="1" d="M2 20 H186 L208 25 L238 3 L268 30 L290 20 H478" />
-      </svg>
-      <p class="rule">Simplified rule: wake 90 min before the exam (Most sleep: 30 min later). Bed by = wake-up − 8 h of sleep − 15 min to fall asleep.</p>
+      <div class="beat-hit" tabindex="0" role="img" aria-label="Heartbeat line" aria-describedby="hd-beat-f">
+        <svg class="beat" viewBox="0 0 480 32" aria-hidden="true" focusable="false" preserveAspectRatio="none">
+          <path class="trace" data-trace pathLength="1" d="M2 20 H186 L208 25 L238 3 L268 30 L290 20 H478" />
+        </svg>
+      </div>
+      <div class="rule-wrap">
+        <p class="rule">Simplified rule: wake 90 min before the exam (Most sleep: 30 min later). Bed by = wake-up − 8 h of sleep − 15 min to fall asleep.</p>
+        <p class="beat-f" id="hd-beat-f"><i>f</i>(<i>t</i>) = 12 for <i>t</i> ≤ 186 and for <i>t</i> ≥ 290; between, straight lines through (208, 7), (238, 29) and (268, 2). Here <i>f</i> = 32 − <i>y</i>.</p>
+      </div>
     </div>
     <div class="dpanel ph" role="tabpanel" id="hd-panel-phone" aria-labelledby="hd-tab-phone" data-panel="phone" hidden>
       <figure class="phone-mini">
@@ -291,16 +296,27 @@ const defaultCaption = SCREENS.find((screen) => screen.value === DEFAULT_SCREEN)
     }
   }
 
-  /* The one autoplaying moment: the trace draws once on load, then holds still.
-     A change on Exam night redraws it quickly. base.css turns both off under reduced motion,
-     which leaves the line fully drawn. */
+  /* Hidden math: the wrapper is the focus stop, so the ring hugs the line. */
+  .beat-hit {
+    display: block;
+    margin: var(--space-3) 0 var(--space-2);
+    border-radius: var(--radius-sheet);
+  }
+
+  .beat-hit:focus-visible {
+    outline-offset: 2px;
+  }
+
   .beat {
+    display: block;
     overflow: visible;
     width: 100%;
     height: auto;
-    margin: var(--space-3) 0 var(--space-2);
   }
 
+  /* The one autoplaying moment: the trace draws once on load, then holds still.
+     A change on Exam night redraws it quickly. base.css turns both off under reduced motion,
+     which leaves the line fully drawn. */
   .trace {
     fill: none;
     stroke: var(--color-trace);
@@ -335,12 +351,48 @@ const defaultCaption = SCREENS.find((screen) => screen.value === DEFAULT_SCREEN)
     }
   }
 
-  .rule {
+  /* Rule and formula share one cell, so the swap never changes the Demo's height.
+     Hover or focus on the line swaps them; base.css makes it instant under reduced motion. */
+  .rule-wrap {
+    display: grid;
+  }
+
+  .rule-wrap > * {
+    grid-area: 1 / 1;
+    min-width: 0;
+    transition:
+      opacity var(--t) ease-out,
+      visibility var(--t) ease-out;
+  }
+
+  .rule,
+  .beat-f {
     font: var(--type-small);
     font-size: 12px;
     line-height: 1.5;
     color: var(--color-ink-3);
     text-wrap: pretty;
+  }
+
+  .beat-f {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .beat-f i {
+    font-style: italic;
+  }
+
+  .beat-hit:hover ~ .rule-wrap .beat-f,
+  .beat-hit:focus ~ .rule-wrap .beat-f {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .beat-hit:hover ~ .rule-wrap .rule,
+  .beat-hit:focus ~ .rule-wrap .rule {
+    opacity: 0;
+    visibility: hidden;
   }
 
   /* On the phone */
