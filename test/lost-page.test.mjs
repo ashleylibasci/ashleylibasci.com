@@ -55,10 +55,49 @@ test('the layout: centered between the bar and the footer, a row that stacks on 
   assert.match(page, /@media \(max-width: 760px\) \{\s*\.lost-in \{\s*flex-direction: column;\s*align-items: flex-start;\s*gap: var\(--space-5\);/);
 });
 
-test('no script, no image, no drawing, no color values, no cut lines, no phone number', () => {
+test('no script, no image, no color values, no cut lines, no phone number', () => {
   assert.equal(/<script\b|<img\b|<svg\b|client:/.test(page), false);
   assert.equal(/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/.test(page), false);
   assert.equal(/Touching is encouraged|1 a\.m\.|bedtime/.test(page), false);
   assert.equal(/\d{3}[-. ]\d{3}[-. ]\d{4}/.test(page), false);
   assert.equal(/\b(?:he|she|his|her|him|hers)\b/i.test(markup), false);
+});
+
+// The swimmer beside the title: a static picture, hidden from readers, that bobs only
+// when motion is allowed.
+const drawing = markup.match(/<span class="lost-s" aria-hidden="true">([\s\S]*?)<\/span>/);
+
+test('the swimmer: one shared drawing, widened, in a hidden wrapper before the text', () => {
+  assert.match(frontmatter, /import Swimmer from '\.\.\/components\/drawings\/Swimmer\.astro';/);
+  assert.ok(drawing, 'the hidden wrapper is there');
+  assert.equal(markup.match(/<Swimmer\b/g)?.length, 1);
+  assert.match(drawing[1], /^<Swimmer viewBox="-3 -6 27 52">[\s\S]*<\/Swimmer>$/);
+  // Before the text, so the title stays the first and only focus target.
+  assert.ok(markup.indexOf('class="lost-s"') < markup.indexOf('<div class="text">'));
+  assert.ok(markup.indexOf('<div class="lost-in">') < markup.indexOf('class="lost-s"'));
+  // Nothing in the picture is focusable, labelled, titled or drawn from a file.
+  assert.equal(/tabindex|aria-label|<title\b|\btitle=|<img\b|<a\b|<button\b|href/.test(drawing[1]), false);
+  // The page never mounts the scripted home island.
+  assert.equal(/SwimmerEgg/.test(page), false);
+});
+
+test('the swimmer extras: three bubbles and a held sheet, with plain class names', () => {
+  assert.equal(drawing[1].match(/<circle class="bubble"/g)?.length, 3);
+  assert.match(drawing[1], /<path class="sheet" d="/);
+  assert.match(drawing[1], /<path class="sheet-fold" d="/);
+  assert.match(drawing[1], /<path class="sheet-line" d="/);
+  // The mockup's short paint names are not copied.
+  const classes = [...drawing[1].matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/));
+  for (const name of classes) assert.equal(['bb', 'mp', 'mf', 'mr'].includes(name), false, name);
+});
+
+test('the swimmer style: size, tilt, opacity, and a bob only when motion is allowed', () => {
+  assert.match(page, /\.lost-s \{\s*flex: none;\s*display: block;\s*width: 36px;\s*height: 69px;\s*opacity: 0\.85;\s*\}/);
+  assert.match(page, /\.lost-s :global\(svg\) \{\s*width: 36px;\s*height: 69px;\s*transform: rotate\(-14deg\);\s*\}/);
+  assert.match(page, /@keyframes lost-bob \{\s*from \{\s*transform: translateY\(-3px\);\s*\}\s*to \{\s*transform: translateY\(3px\);\s*\}\s*\}/);
+  // The one animation is declared inside the no-preference block and nowhere else.
+  assert.equal(page.match(/animation:/g)?.length, 1);
+  assert.match(page, /@media \(prefers-reduced-motion: no-preference\) \{\s*\.lost-s \{\s*animation: lost-bob 3\.4s ease-in-out infinite alternate;\s*\}\s*\}/);
+  // The same opacity in both themes: no theme rule here.
+  assert.equal(/data-theme/.test(page), false);
 });
