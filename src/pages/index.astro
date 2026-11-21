@@ -1,10 +1,25 @@
 ---
 import Base from '../layouts/Base.astro';
+import PrintFrame from '../components/PrintFrame.astro';
+import FramedImage from '../components/FramedImage.astro';
+import headshot from '../assets/headshot-full.jpg';
 ---
 <Base section="home">
   <div class="wrap intro">
-    <h1 id="page-heading" tabindex="-1">Ashley Libasci</h1>
-    <p>Portfolio coming soon.</p>
+    <div class="id">
+      <PrintFrame class="pic">
+        <FramedImage
+          src={headshot}
+          alt="Ashley Libasci"
+          widths={[130, 160, 216, 260, 320, 432, 480, 648]}
+          sizes="(max-width: 760px) clamp(130px, 40vw, 160px), clamp(190px, 15vw, 216px)"
+          position="48% 30%"
+          eager
+        />
+      </PrintFrame>
+      <h1 id="page-heading" tabindex="-1">Ashley Libasci</h1>
+      <p class="line">Portfolio coming soon.</p>
+    </div>
   </div>
 </Base>
 
@@ -14,11 +29,35 @@ import Base from '../layouts/Base.astro';
     padding-bottom: var(--space-8);
   }
 
+  /* The photo on the left, the name centered on the photo's middle with the line under it. */
+  .id {
+    --pw: clamp(190px, 15vw, 216px);
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-areas:
+      'pic .'
+      'pic name'
+      'pic line'
+      'pic .';
+    grid-template-rows: 1fr auto auto 1fr;
+    column-gap: calc(var(--space-5) + var(--space-3));
+    align-items: start;
+  }
+
+  .pic {
+    grid-area: pic;
+  }
+
   h1 {
+    grid-area: name;
     color: var(--color-ink);
     font: var(--type-name);
     letter-spacing: var(--type-name-tracking);
     margin-bottom: var(--space-4);
+  }
+
+  .line {
+    grid-area: line;
   }
 
   @media (max-width: 1060px) {
@@ -32,6 +71,22 @@ import Base from '../layouts/Base.astro';
     .intro {
       padding-top: var(--space-6);
       padding-bottom: var(--space-7);
+    }
+
+    /* Phones: one column, the photo above the name, still on the left. */
+    .id {
+      --pw: clamp(130px, 40vw, 160px);
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'pic'
+        'name'
+        'line';
+      grid-template-rows: auto auto auto;
+    }
+
+    .pic {
+      justify-self: start;
+      margin-bottom: var(--space-5);
     }
 
     h1 {

@@ -1,0 +1,50 @@
+---
+// The one way a raster image reaches a page: through astro:assets, from an original
+// in src/assets/. The box keeps the image's own shape at the width the parent sets
+// in --pw and shows the placeholder tone until the image arrives.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { loadingAttrs } from '../lib/image-loading';
+
+interface Props {
+  src: ImageMetadata;
+  /** Required. Empty only for a decorative image. */
+  alt: string;
+  /** Pixel widths to generate, covering 1x to 3x of the displayed width. */
+  widths: number[];
+  sizes: string;
+  /** Above the fold: load at once. Lazy otherwise. */
+  eager?: boolean;
+  /** object-position for the crop, such as "48% 30%". */
+  position?: string;
+  class?: string;
+}
+
+// The rest carries the placing component's scope attribute, so its styles reach the image.
+const { src, alt, widths, sizes, eager = false, position, class: className, ...rest } = Astro.props;
+const style = [`aspect-ratio:${src.width}/${src.height}`, position && `object-position:${position}`]
+  .filter(Boolean)
+  .join(';');
+---
+<Image
+  src={src}
+  alt={alt}
+  widths={widths}
+  sizes={sizes}
+  class:list={['framed-image', className]}
+  style={style}
+  {...rest}
+  {...loadingAttrs(eager)}
+/>
+
+<style>
+  .framed-image {
+    display: block;
+    width: var(--pw, 100%);
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    background: var(--color-photo-placeholder);
+    border-radius: var(--radius-hairline);
+  }
+</style>

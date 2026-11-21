@@ -1,0 +1,30 @@
+---
+// Print frame: a nearly white print border with a fine hairline, in both themes.
+// Holds a framed image or any other content. Whoever places it sets its size.
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'figure'> {
+  class?: string;
+}
+
+const { class: className, ...rest } = Astro.props;
+---
+<figure class:list={['print-frame', className]} {...rest}>
+  <slot />
+</figure>
+
+<style>
+  .print-frame {
+    display: block;
+    background: var(--color-print);
+    padding: 10px;
+    border: 1px solid var(--color-print-line);
+    border-radius: var(--radius-print);
+  }
+
+  @media (max-width: 760px) {
+    .print-frame {
+      padding: 7px;
+    }
+  }
+</style>
