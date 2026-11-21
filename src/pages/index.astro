@@ -5,6 +5,8 @@ import PrintFrame from '../components/PrintFrame.astro';
 import FramedImage from '../components/FramedImage.astro';
 import CopyEmail from '../islands/copy-email/CopyEmail.astro';
 import ContactSheet from '../components/ContactSheet.astro';
+import Timeline from '../components/Timeline.astro';
+import ClosingLine from '../components/ClosingLine.astro';
 import HealthDemo from '../islands/health-demo/HealthDemo.astro';
 import { CONTACTS } from '../lib/contacts';
 import { routeExists } from '../lib/routes';
@@ -68,6 +70,8 @@ const healthHref = routeExists(health.data.href) ? health.data.href : null;
     </section>
   </div>
   <ContactSheet />
+  <Timeline />
+  <ClosingLine />
 </Base>
 
 <style>

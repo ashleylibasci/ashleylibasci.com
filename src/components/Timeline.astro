@@ -1,0 +1,296 @@
+---
+// Timeline: every entry of the timeline collection, grouped by year, oldest first.
+// Years sit in a left rail against a fine vertical rule with a tick per year; the build
+// year is the current one. An entry that names a project takes its dates, its link
+// target and (when it gives no title) its name from the project.
+import { getCollection, getEntry } from 'astro:content';
+import { COPYRIGHT_YEAR } from '../lib/build-time';
+import { entryFacts } from '../lib/content-rules';
+import { fillTemplate } from '../lib/format';
+import { routeExists } from '../lib/routes';
+import { groupByYear, timelineWhen } from '../lib/timeline';
+
+// Sorted by id, so entries that tie on their dates keep one fixed order.
+const collection = (await getCollection('timeline')).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+
+const entries = await Promise.all(
+  collection.map(async ({ id, data }) => {
+    const project = data.project && (await getEntry(data.project));
+    if (data.project && !project) throw new Error(`timeline/${id}: no project "${data.project.id}"`);
+    const title = data.title ?? project?.data.timelineName;
+    if (!title) throw new Error(`timeline/${id}: no title`);
+    const facts = entryFacts(data, project?.data);
+    return {
+      id,
+      title,
+      org: project ? fillTemplate(data.org, project.data) : data.org,
+      description: data.description,
+      start: facts.start,
+      end: facts.end,
+      when: timelineWhen(facts.start, facts.end, data.whenNote),
+      // The link waits for its page.
+      link:
+        facts.href && data.linkLabel && routeExists(facts.href)
+          ? { href: facts.href, label: data.linkLabel }
+          : undefined,
+    };
+  }),
+);
+
+const years = groupByYear(entries, COPYRIGHT_YEAR);
+---
+<section class="tl wrap" aria-labelledby="h-tl">
+  <div class="tl-head">
+    <h2 id="h-tl">Timeline</h2>
+  </div>
+  <ol class="log">
+    {
+      years.map(({ year, current, entries }) => (
+        <li class:list={['yb', { cur: current }]}>
+          <div class="ym">
+            <p class="yr">{year}{current && <small>This year</small>}</p>
+          </div>
+          <ul class="ev">
+            {entries.map((entry) => (
+              <li>
+                <p class="when">{entry.when}</p>
+                <h3>{entry.title}</h3>
+                <p class="org">{entry.org}</p>
+                <p class="d">
+                  {entry.description}{entry.link && <Fragment> <a href={entry.link.href}>{entry.link.label}</a></Fragment>}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  /* --rx: the rail the years sit in. --wg: the gap between the rule and the entries. */
+  .tl {
+    --rx: var(--space-timeline-rail);
+    --wg: 40px;
+    padding-top: 88px;
+    padding-bottom: var(--space-8);
+  }
+
+  .tl-head {
+    padding-bottom: 56px;
+    padding-left: var(--rx);
+  }
+
+  .tl-head h2 {
+    font: var(--type-section-title);
+    color: var(--color-ink);
+  }
+
+  .log {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 var(--rx);
+  }
+
+  .log::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--rx) - var(--wg));
+    top: -24px;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-rule);
+  }
+
+  .yb {
+    position: relative;
+    padding-bottom: 60px;
+    min-height: 110px;
+  }
+
+  .yb:last-child {
+    padding-bottom: var(--space-4);
+  }
+
+  /* A short tick across the rule at each year. */
+  .yb::before {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--wg) - 8px);
+    top: 20px;
+    width: 17px;
+    height: 1.5px;
+    border-radius: var(--radius-hairline);
+    background: var(--color-teal);
+  }
+
+  .ym {
+    position: absolute;
+    right: calc(100% + var(--wg) + 22px);
+    top: 0;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .yr {
+    font: var(--type-year);
+    font-variant-numeric: lining-nums;
+    color: var(--color-ink-2);
+  }
+
+  .yr small {
+    display: block;
+    margin-top: 10px;
+    font: var(--type-label);
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--color-teal-text);
+  }
+
+  .ev {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6) 56px;
+    max-width: 880px;
+  }
+
+  .ev li {
+    position: relative;
+    min-width: 0;
+  }
+
+  .when {
+    font: var(--type-meta);
+    color: var(--color-ink-3);
+  }
+
+  .ev h3 {
+    font: var(--type-entry-title);
+    font-variant-numeric: lining-nums;
+    color: var(--color-ink);
+    margin-top: 2px;
+  }
+
+  .org {
+    font: var(--type-ui);
+    color: var(--color-ink-2);
+  }
+
+  .d {
+    margin-top: var(--space-1);
+    font: var(--type-ui);
+    line-height: 1.6;
+    color: var(--color-ink-2);
+  }
+
+  .d a {
+    white-space: nowrap;
+  }
+
+  .yb.cur::before {
+    top: 26px;
+    width: 23px;
+    left: calc(-1 * var(--wg) - 11px);
+    height: 2px;
+  }
+
+  .yb.cur .yr {
+    font: var(--type-year-current);
+    font-variant-numeric: lining-nums;
+    color: var(--color-ink);
+  }
+
+  @media (max-width: 1060px) {
+    .tl {
+      --rx: var(--space-timeline-rail-tablet);
+      --wg: 32px;
+    }
+
+    .tl-head h2 {
+      font: var(--type-section-title-tablet);
+    }
+
+    .yr {
+      font-size: 34px;
+    }
+
+    .yb.cur .yr {
+      font-size: 44px;
+    }
+
+    .yb::before {
+      top: 17px;
+    }
+
+    .yb.cur::before {
+      top: 21px;
+    }
+
+    .ev {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .tl {
+      --rx: var(--space-timeline-rail-mobile);
+      --wg: 18px;
+      padding-top: var(--space-8);
+    }
+
+    .tl-head {
+      padding-bottom: var(--space-7);
+    }
+
+    .tl-head h2 {
+      font: var(--type-section-title-mobile);
+    }
+
+    /* Phones: the margin is too narrow to write in, so each year heads its own entries. */
+    .ym {
+      position: static;
+      text-align: left;
+      display: flex;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: var(--space-1) var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .yr {
+      font-size: 36px;
+    }
+
+    .yr small {
+      display: inline;
+      margin: 0 0 0 10px;
+    }
+
+    .yb.cur .yr {
+      font-size: 44px;
+    }
+
+    .yb::before {
+      top: 18px;
+    }
+
+    .yb.cur::before {
+      top: 22px;
+    }
+
+    .yb {
+      padding-bottom: 44px;
+      min-height: 0;
+    }
+
+    /* A 44px touch target; inline padding moves no line. */
+    .d a {
+      padding: 13px 0;
+    }
+  }
+</style>
