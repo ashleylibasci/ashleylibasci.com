@@ -1,0 +1,262 @@
+---
+// The framed visual of a Work entry: a pale field with a hairline. A link when it is given
+// an href; the same markup without the link otherwise. Three kinds: `app` (the app icon over
+// a heartbeat line beside two phone thumbnails), `plate` (one image on a top-rounded plate)
+// and `typeset` (a source line, a rule and an excerpt on the plate).
+// The visual is a size container: every inner size scales with its width, up to the size
+// it has on a desktop, so nothing is cut or overlaps at any width.
+import type { ImageMetadata } from 'astro';
+import FramedImage from './FramedImage.astro';
+import { PLATE_SHARE, plateImage } from '../lib/work-image';
+
+interface Picture {
+  image: ImageMetadata;
+  alt: string;
+}
+
+type Visual =
+  | { kind: 'app'; icon: Picture; screens: readonly Picture[] }
+  | {
+      kind: 'plate';
+      image: ImageMetadata;
+      alt: string;
+      /** How much wider than the plate the image is drawn; 1 by default. */
+      zoom?: number;
+      /** object-position of the crop. */
+      position?: string;
+    }
+  | { kind: 'typeset'; source: string; text: string };
+
+type Props = Visual & {
+  /** The page this visual opens, or null while that page does not exist. */
+  href: string | null;
+  /** Accessible name of the link. Without it the image's alt text names the link. */
+  label?: string;
+};
+
+const props = Astro.props;
+const { href, label } = props;
+
+// Shares of the visual's width, matching the styles below.
+const ICON_SHARE = 0.136;
+const THUMB_SHARE = 0.254;
+
+const Wrap = href ? 'a' : 'div';
+const wrapAttrs = href ? { href, 'aria-label': label } : {};
+const share = (value: number) => Math.round(value * 1000) / 1000;
+---
+<Wrap class:list={['wv', `k-${props.kind}`]} {...wrapAttrs}>
+  {
+    props.kind === 'app' && (
+      <span class="in">
+        <span class="app-l">
+          <FramedImage
+            src={props.icon.image}
+            alt={props.icon.alt}
+            {...plateImage(props.icon.image.width, ICON_SHARE)}
+            class="icon"
+          />
+          <svg class="beat" viewBox="0 0 480 84" aria-hidden="true" focusable="false" preserveAspectRatio="none">
+            <path d="M2 52 H186 L208 64 L238 10 L268 76 L290 52 H478" />
+          </svg>
+        </span>
+        <span class="app-ph">
+          {props.screens.map((screen) => (
+            <FramedImage
+              src={screen.image}
+              alt={screen.alt}
+              {...plateImage(screen.image.width, THUMB_SHARE)}
+              class="thumb"
+            />
+          ))}
+        </span>
+      </span>
+    )
+  }
+  {
+    props.kind === 'plate' && (
+      <span class="in">
+        <span class="plate" style={`--zoom:${props.zoom ?? 1}`}>
+          <FramedImage
+            src={props.image}
+            alt={props.alt}
+            {...plateImage(props.image.width, share(PLATE_SHARE * (props.zoom ?? 1)))}
+            position={props.position}
+            class="shot"
+          />
+        </span>
+      </span>
+    )
+  }
+  {
+    props.kind === 'typeset' && (
+      <span class="in">
+        <span class="plate" aria-hidden={href && label ? 'true' : undefined}>
+          <span class="ts-src">{props.source}</span>
+          <span class="ts-text">{props.text}</span>
+        </span>
+      </span>
+    )
+  }
+</Wrap>
+
+<style>
+  /* The frame. Its height is 6.3/12 of its width, or its content's when that is taller. */
+  .wv {
+    container-type: inline-size;
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    background: var(--color-field);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .wv::before {
+    content: '';
+    grid-area: 1 / 1;
+    padding-top: 52.5%;
+  }
+
+  a.wv:hover {
+    color: var(--color-ink);
+  }
+
+  a.wv:focus-visible {
+    outline-offset: 4px;
+  }
+
+  .in {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+
+  /* The plate: a top-rounded sheet in the mat, running off the bottom edge. */
+  .plate {
+    border: 1px solid var(--color-line);
+    border-bottom: 0;
+    border-radius: min(14px, 2.5cqi) min(14px, 2.5cqi) 0 0;
+    overflow: hidden;
+  }
+
+  .k-plate .in,
+  .k-app .in {
+    position: absolute;
+    inset: 0;
+  }
+
+  .k-plate .plate {
+    position: absolute;
+    inset: min(32px, 5.7cqi) min(32px, 5.7cqi) -1px;
+    background: var(--color-photo-placeholder);
+  }
+
+  /* The image covers the plate; a zoom above 1 draws it wider, centered, from the top. */
+  .k-plate .shot {
+    position: absolute;
+    top: 0;
+    left: calc((1 - var(--zoom)) * 50%);
+    width: calc(100% * var(--zoom));
+    height: calc(100% * var(--zoom));
+    max-width: none;
+    border-radius: 0;
+  }
+
+  /* Typeset: the plate holds words, so it is in the flow and the frame grows with it. */
+  .k-typeset .in {
+    display: flex;
+    padding: min(32px, 5.7cqi) min(32px, 5.7cqi) 0;
+  }
+
+  .k-typeset .plate {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: min(28px, 5cqi) min(32px, 5.7cqi) min(20px, 3.6cqi);
+    background: var(--color-surface);
+  }
+
+  .ts-src {
+    font: var(--type-label);
+    font-size: clamp(12px, 2.5cqi, 14px);
+    line-height: 1.3;
+    color: var(--color-ink-3);
+  }
+
+  .ts-src::after {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 1px;
+    background: var(--color-teal);
+    margin: min(16px, 2.9cqi) 0 min(14px, 2.5cqi);
+  }
+
+  .ts-text {
+    font: 400 clamp(16px, 5.4cqi, 30px) / 1.22 var(--font-display);
+    font-variant-numeric: lining-nums;
+    max-width: 15em;
+    text-wrap: balance;
+  }
+
+  /* App: the icon over a heartbeat line on the left, two phone thumbnails on the right. */
+  .k-app .in {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: min(24px, 4.3cqi);
+    padding-left: min(48px, 8.6cqi);
+  }
+
+  .app-l {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: min(16px, 2.9cqi);
+    min-width: 0;
+  }
+
+  .app-l .icon {
+    flex: none;
+    width: min(76px, 13.6cqi);
+    border-radius: min(18px, 3.2cqi);
+  }
+
+  .beat {
+    flex: none;
+    overflow: visible;
+    width: 100%;
+    height: min(44px, 7.9cqi);
+  }
+
+  .beat path {
+    fill: none;
+    stroke: var(--color-trace);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .app-ph {
+    display: flex;
+    align-items: flex-start;
+    gap: min(14px, 2.5cqi);
+    padding: min(28px, 5cqi) min(32px, 5.7cqi) 0 0;
+  }
+
+  .app-ph .thumb {
+    width: min(142px, 25.4cqi);
+    max-width: none;
+    border: min(6px, 1.07cqi) solid var(--color-thumb-bezel);
+    border-radius: min(24px, 4.3cqi);
+    background: var(--color-thumb-bezel);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--color-thumb-bezel) 18%, transparent);
+  }
+
+  .app-ph .thumb + .thumb {
+    margin-top: min(30px, 5.4cqi);
+  }
+</style>

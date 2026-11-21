@@ -1,7 +1,16 @@
 // Date and status words: one test per row of the story's edge-case matrix.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { fillTemplate, formatRange, formatSeason, formatSince, formatYear, statusWords } from '../src/lib/format.ts';
+import {
+  fillTemplate,
+  formatRange,
+  formatSeason,
+  formatSince,
+  formatTerm,
+  formatYear,
+  statusWords,
+  templateParts,
+} from '../src/lib/format.ts';
 
 const d = (/** @type {string} */ iso) => new Date(iso);
 
@@ -80,4 +89,45 @@ test('status words and year', () => {
 
 test('months are read in UTC', () => {
   assert.equal(formatRange(d('2026-06-01T00:00:00Z'), d('2026-08-01T00:00:00Z')), 'June to August 2026');
+});
+
+test('term', () => {
+  assert.equal(formatTerm(d('2025-08-01'), d('2025-12-01')), 'fall 2025');
+  assert.equal(formatTerm(d('2025-09-01'), d('2025-12-01')), 'fall 2025');
+  assert.equal(formatTerm(d('2026-01-01'), d('2026-05-01')), 'spring 2026');
+  assert.throws(() => formatTerm(d('2026-06-01'), d('2026-08-01')), /fits no term/);
+  assert.throws(() => formatTerm(d('2025-08-01'), d('2026-05-01')), /fits no term/);
+  assert.throws(() => formatTerm(d('2025-08-01'), d('2026-12-01')), /fits no term/);
+  assert.throws(() => formatTerm(d('2025-08-01')), /needs a start and an end/);
+  assert.equal(
+    fillTemplate('a course project ({term})', { start: d('2025-08-01'), end: d('2025-12-01') }),
+    'a course project (fall 2025)',
+  );
+});
+
+test('template parts', () => {
+  const facts = { status: /** @type {const} */ ('building'), stack: ['Swift'] };
+  assert.deepEqual(templateParts('{status} · {stack}', facts), [
+    { text: 'Building now', token: 'status' },
+    { text: ' · ' },
+    { text: 'Swift', token: 'stack' },
+  ]);
+  // Only a line that opens with a token gets the capital.
+  assert.deepEqual(templateParts('Personal project, {status}', { status: 'live' }), [
+    { text: 'Personal project, ' },
+    { text: 'live', token: 'status' },
+  ]);
+  assert.deepEqual(templateParts('No tokens'), [{ text: 'No tokens' }]);
+  assert.deepEqual(templateParts(''), []);
+  assert.throws(() => templateParts('{when}'), /unknown token \{when\}/);
+});
+
+test('the parts joined are fillTemplate', () => {
+  const facts = { start: d('2026-05-01'), status: /** @type {const} */ ('live'), stack: ['Next.js', 'TypeScript'] };
+  for (const template of ['{range} · {status} · {stack}', '{since} · live app', 'Research · {since}', 'plain']) {
+    const joined = templateParts(template, facts)
+      .map((part) => part.text)
+      .join('');
+    assert.equal(joined, fillTemplate(template, facts));
+  }
 });

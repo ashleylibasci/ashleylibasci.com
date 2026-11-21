@@ -55,7 +55,7 @@ const projects = defineCollection({
       stack: z.array(text),
       order: z.number().int(),
       liveUrl: z.url().optional(),
-      // Lines below are templates for fillTemplate: {range} {since} {season} {status} {stack}.
+      // Lines below are templates for fillTemplate: {range} {since} {season} {term} {status} {stack}.
       print: z.strictObject({
         meta: text,
         /** Accessible name of the print, after "Frame n:". */
@@ -127,8 +127,13 @@ const timeline = defineCollection({
       ...entryShape,
       /** Words added after the date, such as a place. */
       whenNote: text.optional(),
+      /** The Work page's sentence on a smaller project: a template filled from this entry's own dates. */
+      workNote: text.optional(),
     })
-    .superRefine((data, ctx) => report(entryIssues(data, { needsStart: false, needsTitle: false }), ctx)),
+    .superRefine((data, ctx) => {
+      report(entryIssues(data, { needsStart: false, needsTitle: false }), ctx);
+      if (data.workNote) fills(data.workNote, data, ['workNote'], ctx);
+    }),
 });
 
 const skills = defineCollection({

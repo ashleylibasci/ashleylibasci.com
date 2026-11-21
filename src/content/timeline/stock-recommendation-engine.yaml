@@ -3,3 +3,4 @@ org: Course project, Intro to CS I Honors
 description: A Next.js app that recommends stocks from a risk profile, back-tested.
 start: 2025-08-01
 end: 2025-12-01
+workNote: 'an AI stock recommendation engine for Intro to CS I Honors ({term}), a Next.js app that recommends stocks from a risk profile, back-tested.'

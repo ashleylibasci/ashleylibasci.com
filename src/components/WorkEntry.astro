@@ -1,0 +1,104 @@
+---
+// Work entry: one project on the Work page. Text on the left (title, tag line, summary,
+// links), one framed visual on the right, given in the default slot. The title is a link
+// when it is given an href; the same markup without the link otherwise.
+import type { Status, TemplatePart } from '../lib/format';
+
+interface Props {
+  title: string;
+  /** The page this entry opens, or null while that page does not exist. */
+  href: string | null;
+  /** The tag line, split at its tokens so the status words can be styled. */
+  tag: readonly TemplatePart[];
+  status: Status;
+  summary: string;
+  links: readonly { href: string; label: string }[];
+}
+
+const { title, href, tag, status, summary, links } = Astro.props;
+// The status words are teal only on the project being built now.
+const current = (part: TemplatePart) => part.token === 'status' && status === 'building';
+---
+<article class="g12">
+  <div class="wt">
+    <h2>{href ? <a href={href}>{title}</a> : title}</h2>
+    <p class="tag">{tag.map((part) => (current(part) ? <span class="cur">{part.text}</span> : part.text))}</p>
+    <p class="b">{summary}</p>
+    {links.length > 0 && <p class="meta">{links.map((link) => <a href={link.href}>{link.label}</a>)}</p>}
+  </div>
+  <div class="visual"><slot /></div>
+</article>
+
+<style>
+  article {
+    padding: var(--space-7) 0;
+    border-top: 1px solid var(--color-line);
+    align-items: center;
+  }
+
+  article:first-child {
+    border-top: 0;
+    padding-top: var(--space-3);
+  }
+
+  .wt {
+    grid-column: 1 / 6;
+    min-width: 0;
+  }
+
+  .visual {
+    grid-column: 7 / 13;
+    min-width: 0;
+  }
+
+  h2 {
+    font: var(--type-work-title);
+    font-variant-numeric: lining-nums;
+  }
+
+  h2 a {
+    color: var(--color-ink);
+    text-decoration-color: transparent;
+    text-underline-offset: 6px;
+  }
+
+  h2 a:hover {
+    color: var(--color-ink);
+    text-decoration-color: var(--color-aqua);
+  }
+
+  .tag {
+    margin-top: var(--space-2);
+    font: var(--type-label);
+    color: var(--color-ink-3);
+  }
+
+  .cur {
+    color: var(--color-teal-text);
+  }
+
+  .b {
+    margin-top: var(--space-3);
+    color: var(--color-ink-2);
+    max-width: 34em;
+  }
+
+  .meta {
+    margin-top: var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    font: var(--type-ui);
+  }
+
+  @media (max-width: 760px) {
+    .visual {
+      margin-top: var(--space-4);
+    }
+
+    h2 {
+      font: var(--type-work-title-mobile);
+      font-variant-numeric: lining-nums;
+    }
+  }
+</style>

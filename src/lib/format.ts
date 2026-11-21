@@ -104,6 +104,23 @@ export function formatSeason(start?: Date, end?: Date): string {
   return `${season} ${year(end)}`;
 }
 
+/**
+ * "fall 2025" for a term that starts in August or September and ends in December;
+ * "spring 2026" for one that runs January to May. Any other pair of months throws.
+ */
+export function formatTerm(start?: Date, end?: Date): string {
+  if (!start || !end) throw new Error('format: a term needs a start and an end');
+  valid(start, 'start');
+  valid(end, 'end');
+  const from = start.getUTCMonth();
+  const to = end.getUTCMonth();
+  if (year(start) === year(end)) {
+    if ((from === 7 || from === 8) && to === 11) return `fall ${year(end)}`;
+    if (from === 0 && to === 4) return `spring ${year(end)}`;
+  }
+  throw new Error(`format: ${month(start)} ${year(start)} to ${month(end)} ${year(end)} fits no term`);
+}
+
 export interface TemplateFacts {
   start?: Date;
   end?: Date;
@@ -111,29 +128,59 @@ export interface TemplateFacts {
   stack?: readonly string[];
 }
 
+/** One piece of a filled template: plain words, or the words a token became. */
+export interface TemplatePart {
+  text: string;
+  /** The token name ("status"), on a part that came from a token. */
+  token?: string;
+}
+
+function fillToken(token: string, facts: TemplateFacts): string {
+  switch (token) {
+    case 'range':
+      return formatRange(facts.start, facts.end);
+    case 'since':
+      return formatSince(facts.start);
+    case 'season':
+      return formatSeason(facts.start, facts.end);
+    case 'term':
+      return formatTerm(facts.start, facts.end);
+    case 'status':
+      if (!facts.status) throw new Error('format: {status} needs a status');
+      return statusWords(facts.status);
+    case 'stack':
+      if (!facts.stack?.length) throw new Error('format: {stack} needs a stack');
+      return facts.stack.join(', ');
+    default:
+      throw new Error(`format: unknown token {${token}}`);
+  }
+}
+
 /**
- * Fill `{range} {since} {season} {status} {stack}` in a line of content, so a date or a
- * status is written once per entry. A line that opens with a token gets a capital:
+ * A template split at its tokens, each token filled, so a page can style one part
+ * (the status words) on its own. Joined, the parts are `fillTemplate`.
+ */
+export function templateParts(template: string, facts: TemplateFacts = {}): TemplatePart[] {
+  const parts: TemplatePart[] = [];
+  let last = 0;
+  for (const match of template.matchAll(/\{([^{}]*)\}/g)) {
+    if (match.index > last) parts.push({ text: template.slice(last, match.index) });
+    parts.push({ text: fillToken(match[1], facts), token: match[1] });
+    last = match.index + match[0].length;
+  }
+  if (last < template.length) parts.push({ text: template.slice(last) });
+  const first = parts[0];
+  if (first && template.startsWith('{')) first.text = first.text.charAt(0).toUpperCase() + first.text.slice(1);
+  return parts;
+}
+
+/**
+ * Fill `{range} {since} {season} {term} {status} {stack}` in a line of content, so a date
+ * or a status is written once per entry. A line that opens with a token gets a capital:
  * "{since} · live app" gives "Since May 2026 · live app".
  */
 export function fillTemplate(template: string, facts: TemplateFacts = {}): string {
-  const filled = template.replace(/\{([^{}]*)\}/g, (_match, token: string) => {
-    switch (token) {
-      case 'range':
-        return formatRange(facts.start, facts.end);
-      case 'since':
-        return formatSince(facts.start);
-      case 'season':
-        return formatSeason(facts.start, facts.end);
-      case 'status':
-        if (!facts.status) throw new Error('format: {status} needs a status');
-        return statusWords(facts.status);
-      case 'stack':
-        if (!facts.stack?.length) throw new Error('format: {stack} needs a stack');
-        return facts.stack.join(', ');
-      default:
-        throw new Error(`format: unknown token {${token}}`);
-    }
-  });
-  return template.startsWith('{') ? filled.charAt(0).toUpperCase() + filled.slice(1) : filled;
+  return templateParts(template, facts)
+    .map((part) => part.text)
+    .join('');
 }
