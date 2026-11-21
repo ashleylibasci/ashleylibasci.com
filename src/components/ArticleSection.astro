@@ -9,19 +9,26 @@ interface Props {
   id: string;
   /** The heading's inner HTML, as the Markdown processor gives it. */
   heading: string;
+  /** The section's own id, for a section that links point at ("resume" for /about#resume). */
+  anchor?: string;
 }
 
-const { id, heading } = Astro.props;
+const { id, heading, anchor } = Astro.props;
 // Rendered first so a wide slot that comes out empty adds no block and no gap.
 const wide = Astro.slots.has('wide') ? (await Astro.slots.render('wide')).trim() : '';
 ---
-<section class="g12">
+<section class="g12" id={anchor} tabindex={anchor ? -1 : undefined} aria-labelledby={anchor ? id : undefined}>
   <h2 id={id} set:html={heading} />
   <div class="col"><slot /></div>
   {wide && <div class="wide" set:html={wide} />}
 </section>
 
 <style>
+  /* A section that is scrolled to clears the sticky bar; its own top padding is the gap. */
+  section[id] {
+    scroll-margin-top: var(--nav);
+  }
+
   .wide {
     grid-column: 4 / 13;
     margin-top: var(--space-6);

@@ -109,8 +109,8 @@ test('the page takes the title and the write-up from the entry', () => {
 
 test('Research is a tab between Work and Experience, and the page marks it current', () => {
   assert.deepEqual(
-    NAV.map((item) => item.key),
-    ['home', 'work', 'research', 'experience'],
+    NAV.slice(1, 4).map((item) => item.key),
+    ['work', 'research', 'experience'],
   );
   assert.deepEqual(NAV[2], { key: 'research', label: 'Research', href: '/research', tab: true });
   assert.match(page, /const page = navItem\('research'\);/);

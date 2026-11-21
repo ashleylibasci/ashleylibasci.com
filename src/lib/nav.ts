@@ -1,5 +1,6 @@
 // One navigation config for the header tabs and the menu sheet.
 // List only pages that exist; header tabs show `tab: true` items, the sheet shows all.
+// Resume is a section of About, not a page: no page passes its key, so it is never current.
 export const SITE_NAME = 'Ashley Libasci';
 
 export interface NavItem {
@@ -14,6 +15,8 @@ export const NAV: readonly NavItem[] = [
   { key: 'work', label: 'Work', href: '/work', tab: true },
   { key: 'research', label: 'Research', href: '/research', tab: true },
   { key: 'experience', label: 'Experience', href: '/experience', tab: true },
+  { key: 'about', label: 'About', href: '/about', tab: true },
+  { key: 'resume', label: 'Resume', href: '/about#resume', tab: true },
 ];
 
 /** The nav item for a key; throws on a key that is not in NAV. */
