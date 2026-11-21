@@ -1,4 +1,6 @@
 ---
+import { Font } from 'astro:assets';
+import '../styles/tokens.css';
 ---
 <!doctype html>
 <html lang="en">
@@ -6,8 +8,25 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ashley Libasci</title>
+    <Font cssVariable="--font-marcellus" preload={[{ weight: 400, style: 'normal' }]} />
+    <Font cssVariable="--font-albert-sans" preload={[{ weight: 400, style: 'normal' }]} />
   </head>
   <body>
     <h1>Ashley Libasci</h1>
+    <p>Portfolio coming soon.</p>
   </body>
 </html>
+
+<style is:global>
+  body {
+    background: var(--color-page);
+    color: var(--color-ink);
+    font: var(--type-body);
+  }
+
+  h1 {
+    color: var(--color-ink);
+    font: var(--type-name);
+    letter-spacing: var(--type-name-tracking);
+  }
+</style>

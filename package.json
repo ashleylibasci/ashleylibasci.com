@@ -12,6 +12,8 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@fontsource/albert-sans": "5.3.0",
+    "@fontsource/marcellus": "5.3.0",
     "astro": "7.4.12"
   },
   "devDependencies": {
