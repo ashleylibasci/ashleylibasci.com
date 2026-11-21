@@ -1,0 +1,102 @@
+---
+// A small fine-line swimmer, upright. A static drawing with no script; whoever
+// places it sets its box and moves it. The paint comes from tokens. The arm
+// carries `data-arm` (its pivot is the shoulder) and the dot at the mouth
+// carries `data-mouth`, where bubbles start. A page that needs more in the
+// picture passes it in the slot, drawn under the arm, and may widen the viewBox.
+interface Props {
+  viewBox?: string;
+}
+
+const { viewBox = '0 0 24 46' } = Astro.props;
+---
+<svg class="swimmer-drawing" viewBox={viewBox} aria-hidden="true" focusable="false">
+  <rect class="pack" x="14.2" y="10.2" width="5" height="13.6" rx="2.4" />
+  <path class="cord" d="M15.6 10.2V8.8H17.6V10.2" />
+  <path class="feet" d="M10.4 34.2C11.2 37.6 12.6 41.2 14.6 45.2L17.2 43.8C15.4 40.6 14.2 37.2 13.6 34Z" />
+  <path class="feet" d="M8.2 34.2C8.4 37.8 8.6 41.4 9.6 45.4L12.4 45C11.6 41.4 11.2 37.8 11 34Z" />
+  <path class="body" d="M10.2 24.4H13.6L13.8 34.6H10.6Z" />
+  <path class="body" d="M8.2 24.4H11.4L11.2 34.6H8.2Z" />
+  <path class="body" d="M8 13.4C8 11.4 9.6 10.2 11.4 10.2 13.2 10.2 14.6 11.4 14.6 13.4L14.4 25H8.2Z" />
+  <path class="band" d="M8.3 22.6H14.4" />
+  <slot />
+  <path class="arm" data-arm d="M10.4 13.6 6.4 16.2 3.8 18.4" />
+  <path class="trim" d="M7.6 9.6C9.6 11.6 13.2 10.6 15.6 9.6" />
+  <circle class="body" cx="11" cy="6" r="4" />
+  <path class="lens" d="M6.6 4.2H9.4C10 4.2 10.2 4.6 10.2 5.2V7.2C10.2 7.8 9.8 8.2 9.2 8.2H7.4C6.8 8.2 6.4 7.6 6.6 7Z" />
+  <path class="cord" d="M10.2 4.6C12 4.2 13.8 4.6 15 5.6" />
+  <circle class="mouth" data-mouth cx="7" cy="9.4" r=".95" />
+</svg>
+
+<style>
+  .swimmer-drawing {
+    display: block;
+    width: 18px;
+    height: 38px;
+    max-width: none;
+    overflow: visible;
+  }
+
+  .body {
+    fill: var(--color-egg-fill);
+    stroke: var(--color-egg-line);
+    stroke-width: 0.85;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .arm {
+    fill: none;
+    stroke: var(--color-egg-line);
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* The pivot is the shoulder, for whoever waves the arm. */
+    transform-box: view-box;
+    transform-origin: 10.4px 13.6px;
+  }
+
+  .pack {
+    fill: var(--color-teal-soft);
+    stroke: var(--color-egg-teal);
+    stroke-width: 0.85;
+  }
+
+  .feet {
+    fill: var(--color-field);
+    stroke: var(--color-egg-line);
+    stroke-width: 0.85;
+    stroke-linejoin: round;
+  }
+
+  .lens {
+    fill: var(--color-field);
+    stroke: var(--color-egg-teal);
+    stroke-width: 0.85;
+  }
+
+  .trim {
+    fill: none;
+    stroke: var(--color-egg-teal);
+    stroke-width: 0.75;
+    stroke-linecap: round;
+  }
+
+  .cord {
+    fill: none;
+    stroke: var(--color-egg-line);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .band {
+    fill: none;
+    stroke: var(--color-egg-teal);
+    stroke-width: 1.1;
+  }
+
+  .mouth {
+    fill: var(--color-egg-line);
+  }
+</style>

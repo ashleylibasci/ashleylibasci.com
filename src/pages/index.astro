@@ -8,6 +8,7 @@ import ContactSheet from '../components/ContactSheet.astro';
 import Timeline from '../components/Timeline.astro';
 import ClosingLine from '../components/ClosingLine.astro';
 import HealthDemo from '../islands/health-demo/HealthDemo.astro';
+import SwimmerEgg from '../islands/swimmer/SwimmerEgg.astro';
 import { CONTACTS } from '../lib/contacts';
 import headshot from '../assets/headshot-full.jpg';
 import healthIcon from '../assets/healthdash-icon.png';
@@ -70,6 +71,7 @@ const healthHref = health.data.href;
   <ContactSheet />
   <Timeline />
   <ClosingLine />
+  <SwimmerEgg sinkTo=".tl" />
 </Base>
 
 <style>

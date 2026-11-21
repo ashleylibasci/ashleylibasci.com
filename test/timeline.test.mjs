@@ -271,7 +271,7 @@ test('the closing line: the mockup words, addresses from CONTACTS, the resume li
 });
 
 test('the home page ends Timeline, then the closing line', () => {
-  assert.match(home, /<ContactSheet \/>\s*<Timeline \/>\s*<ClosingLine \/>\s*<\/Base>/);
+  assert.match(home, /<ContactSheet \/>\s*<Timeline \/>\s*<ClosingLine \/>\s*<SwimmerEgg sinkTo=".tl" \/>\s*<\/Base>/);
 });
 
 test('no color value outside the tokens', () => {

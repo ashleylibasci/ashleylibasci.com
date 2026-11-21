@@ -1,0 +1,319 @@
+---
+// A small swimmer in the right margin of the home page (AD-5 island; the only
+// writer of the swimmer, AD-18). It sinks as the page scrolls toward the end
+// element (`sinkTo`, a CSS selector), sways and lets bubbles go; three quick
+// clicks turn it over once. At the very end it lands on a small sand mound
+// beside a flower sprig, a fish circles it once and it waves. Pictures only:
+// nothing here is focusable or read out. Without the script it holds its lean
+// at the top. Shown at 900px and wider.
+import Swimmer from '../../components/drawings/Swimmer.astro';
+
+interface Props {
+  sinkTo: string;
+}
+
+const { sinkTo } = Astro.props;
+---
+<div class="swimmer-egg" data-swimmer-egg data-sink-to={sinkTo} aria-hidden="true">
+  <div class="figure" data-figure><Swimmer /></div>
+  <div class="bubbles" data-bubbles></div>
+  <div class="sand" data-sand>
+    <svg viewBox="0 0 84 44" focusable="false">
+      <defs>
+        <g id="swimmer-sprig-flower">
+          <g class="petal">
+            <ellipse cx="0" cy="-4.75" rx="3.15" ry="3.85" transform="rotate(0)" />
+            <ellipse cx="0" cy="-4.75" rx="3.15" ry="3.85" transform="rotate(72)" />
+            <ellipse cx="0" cy="-4.75" rx="3.15" ry="3.85" transform="rotate(144)" />
+            <ellipse cx="0" cy="-4.75" rx="3.15" ry="3.85" transform="rotate(216)" />
+            <ellipse cx="0" cy="-4.75" rx="3.15" ry="3.85" transform="rotate(288)" />
+          </g>
+          <g class="vein">
+            <path d="M0 -2.5V-6.2" transform="rotate(0)" />
+            <path d="M0 -2.5V-6.2" transform="rotate(72)" />
+            <path d="M0 -2.5V-6.2" transform="rotate(144)" />
+            <path d="M0 -2.5V-6.2" transform="rotate(216)" />
+            <path d="M0 -2.5V-6.2" transform="rotate(288)" />
+          </g>
+          <circle class="eye" r="1.75" />
+        </g>
+        <g id="swimmer-sprig-leaf" class="leaf">
+          <path d="M0 0C2-2.7 2.2-6.6 0-10-2.2-6.6-2-2.7 0 0Z" />
+          <path class="leaf-vein" d="M0-.8V-8.6" />
+        </g>
+        <g id="swimmer-sprig-bud">
+          <path class="bud" d="M0 0C1.7-1.2 1.9-3.6 0-5.6-1.9-3.6-1.7-1.2 0 0Z" />
+          <path class="stem" d="M-1.3-.6 0 .9 1.3-.6" />
+        </g>
+      </defs>
+      <path class="ground" d="M15 41.5H83.5" />
+      <g class="sprig" transform="translate(17 41) scale(.62) translate(-2 -10.6)">
+        <path class="stem" d="M2 10.6C14 8.8 30 10.4 48 9.4" />
+        <use href="#swimmer-sprig-leaf" transform="translate(11 9.9) rotate(64) scale(0.66)" />
+        <use href="#swimmer-sprig-leaf" transform="translate(19 9.8) rotate(116) scale(0.62)" />
+        <use href="#swimmer-sprig-leaf" transform="translate(27 9.9) rotate(62) scale(0.6)" />
+        <use href="#swimmer-sprig-leaf" transform="translate(35 9.8) rotate(118) scale(0.56)" />
+        <use href="#swimmer-sprig-bud" transform="translate(4.2 10.5) rotate(-96) scale(0.9)" />
+        <use href="#swimmer-sprig-flower" transform="translate(54.6 9.2) scale(0.78)" />
+      </g>
+      <path class="mound" d="M48 41.5C52.6 37.4 59 34 67 34S80.4 37.6 84 41.5Z" />
+      <circle class="grain" cx="60.6" cy="38.6" r=".45" />
+      <circle class="grain" cx="64.8" cy="37" r=".4" />
+      <circle class="grain" cx="72.4" cy="37.6" r=".45" />
+      <circle class="grain" cx="77.6" cy="39.6" r=".4" />
+    </svg>
+  </div>
+  <div class="fish-box">
+    <span class="fish" data-fish>
+      <svg viewBox="0 0 18 10" focusable="false">
+        <path class="fish-body" d="M.8 1.6 3.9 5 .8 8.4C.4 8.6.2 8.4.3 8L1.2 5 .3 2C.2 1.6.4 1.4.8 1.6Z" />
+        <path class="fish-body" d="M3.6 5C5.4 2.2 8.8 1 11.6 1.6 14.2 2.1 16.4 3.6 17.2 5 16.4 6.4 14.2 7.9 11.6 8.4 8.8 9 5.4 7.8 3.6 5Z" />
+        <path class="fish-line" d="M8.6 2.6C9.5 4.1 9.5 5.9 8.6 7.4M10.6 1.7C11.3.8 12.4.6 13.3.9" />
+        <circle class="fish-eye" cx="14.4" cy="4.4" r=".6" />
+      </svg>
+    </span>
+  </div>
+</div>
+
+<script>
+  import './swimmer.ts';
+</script>
+
+<style>
+  .swimmer-egg {
+    /* The right margin, just outside the content column. */
+    --swimmer-right: max(12px, calc((100vw - var(--space-content-max)) / 2 - 2px));
+  }
+
+  /* The figure, upright, sinking feet first. Only the drawing takes the pointer. */
+  .figure {
+    position: fixed;
+    z-index: 20;
+    top: 0;
+    right: var(--swimmer-right);
+    width: 18px;
+    height: 38px;
+    opacity: 0.55;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  :global(:root[data-theme='dark']) .figure {
+    opacity: 0.5;
+  }
+
+  .figure :global(svg) {
+    pointer-events: auto;
+    cursor: default;
+    transform-origin: 50% 50%;
+    transform: rotate(-28deg);
+  }
+
+  .motion .figure :global(svg) {
+    animation: swimmer-sway 3.8s ease-in-out infinite alternate;
+  }
+
+  @keyframes swimmer-sway {
+    from {
+      transform: rotate(-31deg);
+    }
+
+    to {
+      transform: rotate(-25deg);
+    }
+  }
+
+  .landed .figure :global(svg) {
+    animation: none;
+    transform: rotate(-6deg);
+    transition: transform 1.1s var(--ease);
+  }
+
+  /* Bubbles are made by the script, so they carry no scope attribute. */
+  .bubbles {
+    position: fixed;
+    inset: 0;
+    z-index: 19;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .bubbles :global(i) {
+    position: absolute;
+    display: block;
+    border: 1px solid var(--color-egg-teal);
+    border-radius: 50%;
+    opacity: 0;
+    animation: swimmer-rise 1.9s ease-out forwards;
+  }
+
+  @keyframes swimmer-rise {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0);
+    }
+
+    15% {
+      opacity: 0.75;
+    }
+
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx, 0px), var(--dy, -34px));
+    }
+  }
+
+  /* The sand mound and flower sprig at the very end, where the figure lands. */
+  .sand {
+    position: fixed;
+    z-index: 20;
+    bottom: 34px;
+    right: calc(var(--swimmer-right) - 8px);
+    width: 84px;
+    height: 44px;
+    pointer-events: none;
+  }
+
+  /* Below 1300px the margin is too narrow for the sprig to sit beside the footer's
+     last line, so the sand sits 12px lower, under it. */
+  @media (max-width: 1299px) {
+    .sand {
+      bottom: 22px;
+    }
+  }
+
+  .sand svg {
+    display: block;
+    width: 84px;
+    height: 44px;
+    max-width: none;
+    overflow: visible;
+    opacity: 0;
+    transition: opacity 0.6s ease-out;
+  }
+
+  .landed .sand svg {
+    opacity: 0.8;
+  }
+
+  :global(:root[data-theme='dark']) .landed .sand svg {
+    opacity: 0.7;
+  }
+
+  .mound {
+    fill: var(--color-egg-fill);
+    stroke: var(--color-egg-line);
+    stroke-width: 0.8;
+    stroke-linejoin: round;
+  }
+
+  .ground {
+    fill: none;
+    stroke: var(--color-line-2);
+    stroke-width: 0.6;
+    stroke-linecap: round;
+  }
+
+  .grain {
+    fill: var(--color-egg-teal);
+  }
+
+  .sprig {
+    pointer-events: none;
+  }
+
+  .petal {
+    fill: var(--color-flower-petal);
+    stroke: var(--color-flower-line);
+    stroke-width: 0.7;
+    stroke-linejoin: round;
+  }
+
+  .vein {
+    fill: none;
+    stroke: var(--color-flower-vein);
+    stroke-width: 0.42;
+    stroke-linecap: round;
+  }
+
+  .eye {
+    fill: var(--color-flower-eye);
+    stroke: var(--color-flower-line);
+    stroke-width: 0.6;
+  }
+
+  .leaf {
+    fill: none;
+    stroke: var(--color-flower-leaf);
+    stroke-width: 0.8;
+    stroke-linejoin: round;
+  }
+
+  .leaf .leaf-vein {
+    stroke-width: 0.45;
+  }
+
+  .stem {
+    fill: none;
+    stroke: var(--color-flower-leaf);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .bud {
+    fill: var(--color-flower-petal);
+    stroke: var(--color-flower-line);
+    stroke-width: 0.7;
+  }
+
+  /* The fish that circles the landed figure once. */
+  .fish-box {
+    position: fixed;
+    inset: 0;
+    z-index: 21;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .fish {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 10px;
+    margin: -5px 0 0 -9px;
+    opacity: 0;
+  }
+
+  .fish svg {
+    display: block;
+    width: 18px;
+    height: 10px;
+    overflow: visible;
+  }
+
+  .fish-body {
+    fill: var(--color-egg-fill);
+    stroke: var(--color-egg-line);
+    stroke-width: 0.7;
+    stroke-linejoin: round;
+  }
+
+  .fish-line {
+    fill: none;
+    stroke: var(--color-egg-teal);
+    stroke-width: 0.65;
+    stroke-linecap: round;
+  }
+
+  .fish-eye {
+    fill: var(--color-egg-line);
+  }
+
+  @media (max-width: 899px) {
+    .swimmer-egg {
+      display: none;
+    }
+  }
+</style>
