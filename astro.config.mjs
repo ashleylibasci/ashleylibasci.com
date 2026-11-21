@@ -47,6 +47,8 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'never',
   build: { format: 'file' },
+  // Copy keeps the straight quotes it is written with, in Markdown as in the pages.
+  markdown: { smartypants: false },
   fonts: [
     {
       name: 'Marcellus',

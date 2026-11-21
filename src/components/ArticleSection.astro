@@ -1,0 +1,99 @@
+---
+// Article section of an inner page: the heading in columns 1 to 3, the text in columns 4 to 10
+// (default slot) and, when given, a wide block in columns 4 to 12 under it (`wide` slot).
+// Goes inside `.wrap.art`, which base.css lays out. The text is Markdown HTML and carries no
+// scope attribute, so the styles for what it holds (subheads, the Feature list `dl.feat`,
+// the Facts list `dl.facts`) are global, under `.art .col`.
+interface Props {
+  id: string;
+  /** The heading's inner HTML, as the Markdown processor gives it. */
+  heading: string;
+}
+
+const { id, heading } = Astro.props;
+// Rendered first so a wide slot that comes out empty adds no block and no gap.
+const wide = Astro.slots.has('wide') ? (await Astro.slots.render('wide')).trim() : '';
+---
+<section class="g12">
+  <h2 id={id} set:html={heading} />
+  <div class="col"><slot /></div>
+  {wide && <div class="wide" set:html={wide} />}
+</section>
+
+<style>
+  .wide {
+    grid-column: 4 / 13;
+    margin-top: var(--space-6);
+    min-width: 0;
+  }
+
+  @media (max-width: 760px) {
+    .wide {
+      margin-top: var(--space-5);
+    }
+  }
+</style>
+
+<style is:global>
+  .art .col h3 {
+    font: var(--type-entry-title);
+    margin-top: var(--space-5);
+  }
+
+  .art .col h3:first-child {
+    margin-top: 0;
+  }
+
+  .art .col h3 + p {
+    margin-top: var(--space-2);
+    max-width: 40em;
+  }
+
+  /* Feature list: a term in the heading face, its description beside it. */
+  .art dl.feat {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: var(--space-3) var(--space-5);
+    max-width: 48em;
+  }
+
+  .art dl.feat dt {
+    font: var(--type-feature-term);
+    font-variant-numeric: lining-nums;
+  }
+
+  .art dl.feat dd {
+    margin: 0;
+    color: var(--color-ink-2);
+  }
+
+  /* Facts list: a quiet term, its value beside it. */
+  .art dl.facts {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: var(--space-2) var(--space-5);
+    font: var(--type-ui);
+    max-width: 46em;
+  }
+
+  .art dl.facts dt {
+    color: var(--color-ink-3);
+  }
+
+  .art dl.facts dd {
+    margin: 0;
+  }
+
+  @media (max-width: 760px) {
+    .art dl.feat,
+    .art dl.facts {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .art dl.feat dd,
+    .art dl.facts dd {
+      margin-bottom: var(--space-3);
+    }
+  }
+</style>

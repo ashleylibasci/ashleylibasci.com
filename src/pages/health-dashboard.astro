@@ -1,0 +1,109 @@
+---
+// Health Dashboard case study. Every sentence of the write-up is the Markdown body of the
+// project entry, placed by position: the part before the first heading is the hero's lead,
+// each heading opens an Article section, and a [[figure:name]] paragraph is a figure with
+// its caption. The schema carries no image fields, so the pictures, their alt text and the
+// line under the screenshots are mapped here. Sample and example data only.
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ArticleSection from '../components/ArticleSection.astro';
+import CaseHero from '../components/CaseHero.astro';
+import DeviceFrame from '../components/DeviceFrame.astro';
+import Figure from '../components/Figure.astro';
+import NightsChart from '../components/figures/NightsChart.astro';
+import PlanBackwardChart from '../components/figures/PlanBackwardChart.astro';
+import { checkFigures, splitArticle } from '../lib/article';
+import { navItem } from '../lib/nav';
+import healthIcon from '../assets/healthdash-icon.png';
+import healthSleep from '../assets/healthdash-sleep.jpg';
+import healthFitness from '../assets/healthdash-fitness.jpg';
+
+const ID = 'health-dashboard';
+
+// The drawings the write-up places by name. A wide figure sits on a slab under the
+// section's text; the others sit in the text where the write-up puts them.
+const FIGURES: Record<string, { chart: typeof NightsChart; wide?: boolean; maxWidth?: number }> = {
+  nights: { chart: NightsChart, wide: true },
+  'plan-backward': { chart: PlanBackwardChart, maxWidth: 620 },
+};
+
+const ICON = { image: healthIcon, alt: 'The app icon, redesigned November 1: a sunburst with a heartbeat line' };
+const SHOTS = [
+  {
+    image: healthSleep,
+    alt: "Health Dashboard Sleep tab: 7 hours 21 minutes last night, 39 minutes short of an 8 hour need, and tonight's plan to be in bed by 11:50 p.m. and up at 8:30 a.m.",
+  },
+  {
+    image: healthFitness,
+    alt: "Health Dashboard Fitness tab: 'Keep it easy' with a recovery of 68, and today's session timed so I'm done early for a BIOL 210 exam at 8 a.m. tomorrow.",
+  },
+];
+const SHOTS_LABEL = 'App screenshots';
+const SHOTS_CAPTION = "Sleep and Fitness on iPhone, running on the app's built-in example data.";
+
+const work = navItem('work');
+const home = navItem('home');
+
+const entry = await getEntry('projects', ID);
+if (!entry) throw new Error(`${ID}: the project entry is missing`);
+const html = entry.rendered?.html;
+if (!html?.trim()) throw new Error(`${ID}: the project entry has no write-up`);
+
+const article = splitArticle(html);
+if (!article.lead) throw new Error(`${ID}: the write-up has no lead before its first heading`);
+// An unknown figure name, or a figure the write-up never uses, fails the build.
+checkFigures(article, Object.keys(FIGURES), ID);
+
+const sections = article.sections.map((section) => {
+  const parts = section.parts.map((part) => (part.kind === 'figure' ? { ...part, ...FIGURES[part.name] } : part));
+  return {
+    ...section,
+    text: parts.filter((part) => part.kind === 'html' || !part.wide),
+    wide: parts.filter((part) => part.kind === 'figure' && part.wide),
+  };
+});
+---
+<Base title={entry.data.title} section={work.key}>
+  <CaseHero
+    title={entry.data.title}
+    crumbs={[
+      { label: home.label, href: home.href },
+      { label: work.label, href: work.href },
+    ]}
+    icon={ICON}
+    shotsLabel={SHOTS_LABEL}
+    shotsCaption={SHOTS_CAPTION}
+  >
+    <Fragment set:html={article.lead} />
+    <Fragment slot="shots">{SHOTS.map((shot) => <DeviceFrame src={shot.image} alt={shot.alt} />)}</Fragment>
+  </CaseHero>
+  <div class="wrap art">
+    {
+      sections.map((section) => (
+        <ArticleSection id={section.id} heading={section.heading}>
+          {section.text.map((part) =>
+            part.kind === 'html' ? (
+              <Fragment set:html={part.html} />
+            ) : (
+              <Figure maxWidth={part.maxWidth}>
+                <part.chart />
+                <Fragment slot="caption" set:html={part.caption} />
+              </Figure>
+            ),
+          )}
+          <Fragment slot="wide">
+            {section.wide.map(
+              (part) =>
+                part.kind === 'figure' && (
+                  <Figure wide>
+                    <part.chart />
+                    <Fragment slot="caption" set:html={part.caption} />
+                  </Figure>
+                ),
+            )}
+          </Fragment>
+        </ArticleSection>
+      ))
+    }
+  </div>
+</Base>

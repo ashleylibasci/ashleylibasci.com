@@ -1,0 +1,210 @@
+---
+// Case hero: the pale band that opens a case study. On the left the breadcrumb, the app icon
+// beside the title and the lead (default slot: a standfirst paragraph, then a status list);
+// on the right the screenshots (`shots` slot) over their caption. The shots move under the
+// intro, left-aligned, at 1060px and below.
+// The title is the skip-link and page-load focus target. The lead is Markdown HTML and
+// carries no scope attribute, so its styles are global, under `.case-lead`.
+import type { ImageMetadata } from 'astro';
+import FramedImage from './FramedImage.astro';
+import { routeExists } from '../lib/routes';
+
+interface Props {
+  title: string;
+  /** Breadcrumb steps before this page, first to last. */
+  crumbs?: readonly { label: string; href: string }[];
+  icon: { image: ImageMetadata; alt: string };
+  /** Accessible name of the group of screenshots. */
+  shotsLabel: string;
+  shotsCaption: string;
+}
+
+const { title, crumbs = [], icon, shotsLabel, shotsCaption } = Astro.props;
+
+// The icon is 88px wide, 68px at 760px and below.
+const ICON_SIZES = '(max-width: 760px) 68px, 88px';
+const iconWidths = [...new Set([88, 176, 264].map((width) => Math.min(width, icon.image.width)))];
+---
+<div class="hero">
+  <div class="wrap g12">
+    <div class="intro">
+      <nav class="crumb" aria-label="Breadcrumb">
+        {
+          crumbs.map((step) => (
+            <Fragment>
+              {routeExists(step.href) ? <a href={step.href}>{step.label}</a> : <span>{step.label}</span>}
+              {' / '}
+            </Fragment>
+          ))
+        }<span>{title}</span>
+      </nav>
+      <div class="id">
+        <FramedImage src={icon.image} alt={icon.alt} widths={iconWidths} sizes={ICON_SIZES} eager class="icon" />
+        <h1 id="page-heading" tabindex="-1">{title}</h1>
+      </div>
+      <div class="case-lead"><slot /></div>
+    </div>
+    <div class="shots-wrap">
+      <div class="shots" role="group" aria-label={shotsLabel}><slot name="shots" /></div>
+      <p class="shots-cap">{shotsCaption}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hero {
+    background: var(--color-field);
+    border-bottom: 1px solid var(--color-hair);
+  }
+
+  .hero .wrap {
+    align-items: start;
+  }
+
+  .intro {
+    grid-column: 1 / 7;
+    min-width: 0;
+    padding: var(--space-8) 0 var(--space-7);
+  }
+
+  .crumb {
+    font: var(--type-label);
+    color: var(--color-ink-3);
+  }
+
+  .crumb a {
+    color: var(--color-ink-3);
+  }
+
+  .crumb a:hover {
+    color: var(--color-ink);
+  }
+
+  .id {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    margin-top: var(--space-5);
+  }
+
+  .id .icon {
+    flex: none;
+    width: 88px;
+    border-radius: 20px;
+  }
+
+  h1 {
+    min-width: 0;
+    font: var(--type-case-title);
+  }
+
+  .shots-wrap {
+    grid-column: 7 / 13;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-bottom: var(--space-7);
+  }
+
+  .shots {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: var(--space-5);
+    padding: var(--space-7) 0 var(--space-3);
+  }
+
+  .shots-cap {
+    font: var(--type-caption);
+    color: var(--color-ink-3);
+    max-width: 420px;
+    text-align: right;
+    text-wrap: balance;
+  }
+
+  @media (max-width: 1060px) {
+    .intro {
+      grid-column: 1 / -1;
+      padding-bottom: 0;
+    }
+
+    .shots-wrap {
+      grid-column: 1 / -1;
+      align-items: flex-start;
+    }
+
+    .shots {
+      justify-content: flex-start;
+    }
+
+    .shots-cap {
+      text-align: left;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .intro {
+      padding-top: var(--space-6);
+    }
+
+    .id {
+      gap: var(--space-4);
+    }
+
+    .id .icon {
+      width: 68px;
+      border-radius: 16px;
+    }
+
+    .shots {
+      gap: var(--space-4);
+      padding: var(--space-6) 0 var(--space-3);
+    }
+  }
+</style>
+
+<style is:global>
+  .case-lead > p {
+    margin-top: var(--space-5);
+    font: var(--type-standfirst);
+    max-width: 30em;
+    color: var(--color-ink-2);
+  }
+
+  .case-lead > dl {
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-hair);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-2) var(--space-5);
+    font: var(--type-ui);
+    max-width: 34em;
+  }
+
+  .case-lead > dl dt {
+    color: var(--color-ink-3);
+  }
+
+  .case-lead > dl dd {
+    margin: 0;
+    color: var(--color-ink);
+  }
+
+  /* The first value is the status. */
+  .case-lead > dl dd:first-of-type {
+    font-weight: 500;
+  }
+
+  @media (max-width: 760px) {
+    .case-lead > dl {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .case-lead > dl dd {
+      margin-bottom: var(--space-3);
+    }
+  }
+</style>

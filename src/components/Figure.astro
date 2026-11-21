@@ -1,0 +1,111 @@
+---
+// Figure: a drawing (default slot) over its caption (`caption` slot). `wide` sets the drawing
+// on a white slab; `maxWidth` caps a figure that sits in the text column.
+// The drawing is another component's SVG and the caption is Markdown HTML, so neither carries
+// this component's scope: the styles are global, under `.fig`. A chart draws with the shared
+// classes below (`ax`, `tick`, `base`, `ln`, `bar-a`, `sleep`, `settle`, `exam`; on text `lb`, `on`).
+interface Props {
+  wide?: boolean;
+  /** In px. */
+  maxWidth?: number;
+}
+
+const { wide = false, maxWidth } = Astro.props;
+---
+<figure class:list={['fig', { wide }]} style={maxWidth ? `max-width:${maxWidth}px` : undefined}>
+  {wide ? <div class="slab"><slot /></div> : <slot />}
+  <figcaption class="cap"><slot name="caption" /></figcaption>
+</figure>
+
+<style is:global>
+  .fig {
+    margin-top: var(--space-4);
+  }
+
+  .fig.wide {
+    margin-top: 0;
+  }
+
+  .fig .slab {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+  }
+
+  .fig .cap {
+    margin-top: var(--space-2);
+    font: var(--type-meta);
+    color: var(--color-ink-3);
+  }
+
+  .fig .cap b,
+  .fig .cap strong {
+    font-weight: 500;
+    color: var(--color-ink-2);
+  }
+
+  .fig svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .fig text {
+    font: var(--type-small);
+    /* The shorthand resets figures. */
+    font-variant-numeric: tabular-nums lining-nums;
+    fill: var(--color-ink-2);
+  }
+
+  .fig text.lb {
+    fill: var(--color-ink);
+    font-weight: 500;
+  }
+
+  /* Words on the sleep bar. */
+  .fig text.on {
+    fill: var(--color-print);
+    font-weight: 500;
+  }
+
+  .fig .ax {
+    stroke: var(--color-line);
+    stroke-width: 1;
+  }
+
+  .fig .tick {
+    stroke: var(--color-ink-3);
+    stroke-width: 1;
+  }
+
+  .fig .base {
+    stroke: var(--color-ink-3);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+
+  .fig .ln {
+    fill: none;
+    stroke: var(--color-chart-line);
+    stroke-width: 2;
+  }
+
+  .fig .bar-a,
+  .fig .settle {
+    fill: var(--color-chart-a);
+  }
+
+  .fig .sleep {
+    fill: var(--color-chart-sleep);
+  }
+
+  .fig .exam {
+    fill: var(--color-ink);
+  }
+
+  @media (max-width: 760px) {
+    .fig .slab {
+      padding: var(--space-3);
+    }
+  }
+</style>
