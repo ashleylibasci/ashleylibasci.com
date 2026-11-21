@@ -1,0 +1,183 @@
+/* Base styles shared by every page. Values come from tokens.css only. */
+
+:root {
+  --ease: cubic-bezier(0.2, 0.7, 0.25, 1);
+  --t: 0.2s;
+  --nav: var(--space-nav-height);
+}
+
+/* short laptop screens */
+@media (min-width: 1061px) and (max-height: 860px) {
+  :root {
+    --nav: var(--space-nav-height-short);
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --nav: var(--space-nav-height-mobile);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-synthesis: none;
+}
+
+body {
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-ink);
+  font: var(--type-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition:
+    background-color var(--t) ease-out,
+    color var(--t) ease-out;
+}
+
+body.locked {
+  overflow: hidden;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1,
+h2 {
+  line-height: 1.12;
+}
+
+h3,
+h4 {
+  line-height: 1.2;
+}
+
+p,
+ul,
+ol,
+dl,
+figure {
+  margin: 0;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  transition:
+    color var(--t) ease-out,
+    text-decoration-color var(--t) ease-out;
+}
+
+a:hover {
+  color: var(--color-link-hover);
+  text-decoration-color: currentColor;
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+.wrap {
+  --gut: var(--space-gutter-desktop);
+  max-width: var(--space-content-max);
+  margin: 0 auto;
+  padding: 0 var(--gut);
+}
+
+@media (max-width: 1060px) {
+  .wrap {
+    --gut: var(--space-gutter-tablet);
+  }
+}
+
+@media (max-width: 760px) {
+  .wrap {
+    --gut: var(--space-gutter-mobile);
+  }
+}
+
+/* Skip link: off-screen until focused. */
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: var(--space-2);
+  z-index: 80;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  padding: 6px 10px;
+}
+
+.skip:focus {
+  left: var(--space-3);
+}
+
+/* The page heading clears the sticky bar when it is scrolled to. */
+#page-heading {
+  scroll-margin-top: calc(var(--nav) + var(--space-5));
+}
+
+/* Brand mark, shared by the top bar and the menu sheet. */
+.brand {
+  font: var(--type-brand);
+  letter-spacing: var(--type-brand-tracking);
+  font-variant-numeric: lining-nums;
+  white-space: nowrap;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.brand:hover {
+  color: var(--color-link);
+}
+
+@media (max-width: 760px) {
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* Reserved slots for later features add no gap while empty. */
+[data-slot]:empty {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

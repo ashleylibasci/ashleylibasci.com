@@ -1,0 +1,145 @@
+---
+// Phone menu: a Menu button and a native modal <dialog> sheet (AD-5 island).
+// Items come in as props so this island imports nothing from src/lib.
+interface Props {
+  items: readonly { key: string; label: string; href: string }[];
+  section?: string;
+  siteName: string;
+}
+
+const { items, section, siteName } = Astro.props;
+---
+<button
+  class="menu-btn menu-open"
+  id="menu-btn"
+  type="button"
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-controls="menu-sheet">Menu</button>
+
+<dialog class="sheet" id="menu-sheet" aria-label="Menu">
+  <div class="sheet-top">
+    <a class="brand" href="/">{siteName}</a>
+    <button class="menu-btn" id="menu-close" type="button" autofocus>Close</button>
+  </div>
+  <nav class="sheet-nav" aria-label="Main">
+    {
+      items.map((item) => (
+        <a href={item.href} aria-current={item.key === section ? 'page' : undefined}>
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+  <div class="sheet-foot">
+    <div data-slot="theme-toggle"></div>
+  </div>
+</dialog>
+
+<script>
+  import './menu-sheet.ts';
+</script>
+
+<style>
+  .menu-btn {
+    font: var(--type-button-small);
+    color: var(--color-ink);
+    background: none;
+    border: 1px solid var(--color-line-2);
+    border-radius: var(--radius-full);
+    padding: 8px 16px;
+    cursor: pointer;
+    transition:
+      color var(--t) ease-out,
+      border-color var(--t) ease-out;
+  }
+
+  .menu-btn:hover {
+    border-color: var(--color-ink-3);
+  }
+
+  .menu-open {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    .menu-btn {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .menu-open {
+      display: inline-block;
+    }
+  }
+
+  .sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--color-page);
+    color: var(--color-ink);
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .sheet[open] {
+    display: flex;
+  }
+
+  .sheet::backdrop {
+    background: var(--color-page);
+  }
+
+  .sheet-top {
+    flex: none;
+    height: var(--space-nav-height-mobile);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-4);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .sheet-nav {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-3) var(--space-4) 0;
+  }
+
+  .sheet-nav a {
+    font: var(--type-menu-link);
+    font-variant-numeric: lining-nums;
+    color: var(--color-ink);
+    text-decoration: none;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .sheet-nav a:hover {
+    color: var(--color-link);
+  }
+
+  .sheet-nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-color: var(--color-aqua);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 7px;
+  }
+
+  .sheet-foot {
+    padding: var(--space-5) var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-5);
+    font: var(--type-ui);
+  }
+</style>

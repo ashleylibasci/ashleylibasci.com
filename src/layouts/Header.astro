@@ -1,0 +1,105 @@
+---
+import { NAV, SITE_NAME } from '../lib/nav';
+import MenuSheet from '../islands/menu-sheet/MenuSheet.astro';
+
+interface Props {
+  section?: string;
+}
+
+const { section } = Astro.props;
+const tabs = NAV.filter((item) => item.tab);
+---
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/">{SITE_NAME}</a>
+    <div class="end">
+      {
+        tabs.length > 0 && (
+          <nav class="tabs" aria-label="Main">
+            {tabs.map((item) => (
+              <a href={item.href} aria-current={item.key === section ? 'page' : undefined}>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        )
+      }
+      <div class="theme-slot" data-slot="theme-toggle"></div>
+      <MenuSheet items={NAV} section={section} siteName={SITE_NAME} />
+    </div>
+  </div>
+</header>
+
+<style>
+  .top {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--color-page);
+    border-bottom: 1px solid var(--color-line);
+    transition: background-color var(--t) ease-out;
+  }
+
+  .top .wrap {
+    height: var(--nav);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .end {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .tabs {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    font: var(--type-ui);
+  }
+
+  .tabs a {
+    position: relative;
+    color: var(--color-ink-2);
+    text-decoration: none;
+    padding: 6px 0;
+  }
+
+  .tabs a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1.5px;
+    background: var(--color-aqua);
+    transform: scaleX(0);
+    transition: transform var(--t) var(--ease);
+  }
+
+  .tabs a:hover {
+    color: var(--color-ink);
+  }
+
+  .tabs a:hover::after {
+    transform: scaleX(0.5);
+  }
+
+  .tabs a[aria-current='page'] {
+    color: var(--color-ink);
+  }
+
+  .tabs a[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  @media (max-width: 760px) {
+    .tabs,
+    .theme-slot {
+      display: none;
+    }
+  }
+</style>

@@ -1,32 +1,42 @@
 ---
-import { Font } from 'astro:assets';
-import '../styles/tokens.css';
+import Base from '../layouts/Base.astro';
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ashley Libasci</title>
-    <Font cssVariable="--font-marcellus" preload={[{ weight: 400, style: 'normal' }]} />
-    <Font cssVariable="--font-albert-sans" preload={[{ weight: 400, style: 'normal' }]} />
-  </head>
-  <body>
-    <h1>Ashley Libasci</h1>
+<Base section="home">
+  <div class="wrap intro">
+    <h1 id="page-heading" tabindex="-1">Ashley Libasci</h1>
     <p>Portfolio coming soon.</p>
-  </body>
-</html>
+  </div>
+</Base>
 
-<style is:global>
-  body {
-    background: var(--color-page);
-    color: var(--color-ink);
-    font: var(--type-body);
+<style>
+  .intro {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-8);
   }
 
   h1 {
     color: var(--color-ink);
     font: var(--type-name);
     letter-spacing: var(--type-name-tracking);
+    margin-bottom: var(--space-4);
+  }
+
+  @media (max-width: 1060px) {
+    h1 {
+      font: var(--type-name-tablet);
+      letter-spacing: var(--type-name-tablet-tracking);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .intro {
+      padding-top: var(--space-6);
+      padding-bottom: var(--space-7);
+    }
+
+    h1 {
+      font: var(--type-name-mobile);
+      letter-spacing: var(--type-name-mobile-tracking);
+    }
   }
 </style>

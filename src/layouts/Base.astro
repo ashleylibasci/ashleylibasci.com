@@ -1,0 +1,38 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import { SITE_NAME } from '../lib/nav';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import PageFocus from '../islands/page-focus/PageFocus.astro';
+
+interface Props {
+  /** Page name; the home page leaves it out and gets the bare site name. */
+  title?: string;
+  /** NAV key of the current page, for aria-current. */
+  section?: string;
+}
+
+const { title, section } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <Font cssVariable="--font-marcellus" preload={[{ weight: 400, style: 'normal' }]} />
+    <Font cssVariable="--font-albert-sans" preload={[{ weight: 400, style: 'normal' }]} />
+  </head>
+  <body>
+    <a class="skip" href="#page-heading">Skip to content</a>
+    <Header section={section} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <PageFocus />
+  </body>
+</html>

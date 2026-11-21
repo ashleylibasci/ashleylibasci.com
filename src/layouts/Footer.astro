@@ -1,0 +1,38 @@
+---
+import { COPYRIGHT_YEAR, UPDATED_LABEL } from '../lib/build-time';
+import { SITE_NAME } from '../lib/nav';
+---
+<footer class="foot">
+  <div class="wrap">
+    <span class="cr"><span>© {COPYRIGHT_YEAR} {SITE_NAME}</span><span data-slot="footer-drawing"></span></span>
+    <span>Updated {UPDATED_LABEL}</span>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .foot .wrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-6);
+    font: var(--type-meta);
+    color: var(--color-ink-3);
+  }
+
+  .cr {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+  }
+
+  .cr > span {
+    padding-bottom: 1px;
+  }
+</style>
