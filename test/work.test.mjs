@@ -149,10 +149,45 @@ test('plateImage: widths reach 3x of the widest visual when the original allows'
   assert.equal(plateImage(200).widths.join(), '200');
 });
 
-test('plateImage: a bad width or scale throws', () => {
+test('plateImage with a cap: every size is bound by it and widths stop at 3x the cap', () => {
+  const icon = plateImage(1024, 0.136, 76);
+  assert.equal(
+    icon.sizes,
+    '(max-width: 760px) min(calc((100vw - 40px) * 0.136), 76px), (max-width: 1060px) min(calc((50vw - 44px) * 0.136), 76px), ' +
+      '(max-width: 1271px) min(calc((50vw - 76px) * 0.136), 76px), 76px',
+  );
+  assert.equal(icon.widths.at(-1), 228);
+  assert.ok(icon.widths.every((w) => w <= 228), icon.widths.join(' '));
+  const thumb = plateImage(1206, 0.254, 142);
+  assert.equal(thumb.widths.at(-1), 426);
+  assert.match(thumb.sizes, /^\(max-width: 760px\) min\(calc\(\(100vw - 40px\) \* 0\.254\), 142px\), .*, 142px$/);
+  // The original still caps first, and the last size is the smaller of the full width and the cap.
+  assert.equal(plateImage(200, 0.254, 142).widths.at(-1), 200);
+  assert.match(plateImage(1200, 0.1, 76).sizes, /, 56px$/);
+});
+
+test('plateImage without a cap is unchanged', () => {
+  assert.deepEqual(plateImage(506, 0.254, undefined), plateImage(506, 0.254));
+  assert.equal(plateImage(4000, 0.136).widths.at(-1), 294);
+  assert.equal(/min\(/.test(plateImage(4000, 0.136).sizes), false);
+});
+
+test('WorkVisual caps the icon at 76px and the thumbnails at 142px, as its styles draw them', () => {
+  assert.match(visual, /const ICON_MAX = 76;/);
+  assert.match(visual, /const THUMB_MAX = 142;/);
+  assert.match(visual, /plateImage\(props\.icon\.image\.width, ICON_SHARE, ICON_MAX\)/);
+  assert.match(visual, /plateImage\(screen\.image\.width, THUMB_SHARE, THUMB_MAX\)/);
+  assert.match(visual, /width: min\(76px, 13\.6cqi\);/);
+  assert.match(visual, /width: min\(142px, 25\.4cqi\);/);
+});
+
+test('plateImage: a bad width, scale or cap throws', () => {
   assert.throws(() => plateImage(0), /work-image/);
   assert.throws(() => plateImage(Number.NaN), /work-image/);
   assert.throws(() => plateImage(1200, 0), /work-image/);
+  for (const max of [0, -76, Number.NaN, Number.POSITIVE_INFINITY]) {
+    assert.throws(() => plateImage(1200, 0.136, max), /work-image: .* is not a width cap/, String(max));
+  }
 });
 
 test('every entry has a picture mapped by id or a work.plate; neither fails the build, naming the entry', () => {
@@ -181,21 +216,22 @@ test('the page takes every word of an entry from the collection, in order', () =
   }
 });
 
-test('title, link label and visual link only when the page exists; the live app link always shows', () => {
-  assert.match(page, /const href = routeExists\(data\.href\) \? data\.href : null;/);
-  assert.match(page, /\.\.\.\(href \? \[\{ href, label: data\.work\.linkLabel \}\] : \[\]\)/);
+test('title, link label and visual link to the entry page; the live app link shows when there is one', () => {
+  assert.match(page, /const href = data\.href;/);
+  assert.match(page, /links: \[\s*\{ href, label: data\.work\.linkLabel \},/);
   assert.match(page, /\.\.\.\(data\.liveUrl \? \[\{ href: data\.liveUrl, label: LIVE_LABEL \}\] : \[\]\)/);
   assert.match(page, /const LIVE_LABEL = 'Open the live app';/);
-  assert.match(entry, /<h2>\{href \? <a href=\{href\}>\{title\}<\/a> : title\}<\/h2>/);
+  assert.match(entry, /<h2><a href=\{href\}>\{title\}<\/a><\/h2>/);
+  assert.match(entry, /href: string;/);
   assert.match(entry, /\{links\.length > 0 && <p class="meta">/);
-  assert.match(visual, /const Wrap = href \? 'a' : 'div';/);
-  assert.match(visual, /href \? \{ href, 'aria-label': label \} : \{\}/);
+  assert.match(visual, /<a class:list=\{\['wv', `k-\$\{props\.kind\}`\]\} href=\{href\} aria-label=\{label\}>/);
+  assert.match(visual, /href: string;/);
   assert.equal(visual.match(/aria-label/g)?.length, 1);
 });
 
-test('a typeset plate inside a link is hidden; the heartbeat always is', () => {
+test('a typeset plate with a link name is hidden; the heartbeat always is', () => {
   // Hidden only when the link has its own name; otherwise the words name it.
-  assert.match(visual, /<span class="plate" aria-hidden=\{href && label \? 'true' : undefined\}>/);
+  assert.match(visual, /<span class="plate" aria-hidden=\{label \? 'true' : undefined\}>/);
   assert.match(visual, /<svg class="beat" viewBox="0 0 480 84" aria-hidden="true"/);
   assert.match(visual, /d="M2 52 H186 L208 64 L238 10 L268 76 L290 52 H478"/);
   assert.match(visual, /stroke: var\(--color-trace\);\s*stroke-width: 1\.6;/);

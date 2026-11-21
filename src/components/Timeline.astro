@@ -7,7 +7,6 @@ import { getCollection, getEntry } from 'astro:content';
 import { COPYRIGHT_YEAR } from '../lib/build-time';
 import { entryFacts } from '../lib/content-rules';
 import { fillTemplate } from '../lib/format';
-import { routeExists } from '../lib/routes';
 import { groupByYear, timelineWhen } from '../lib/timeline';
 
 // Sorted by id, so entries that tie on their dates keep one fixed order.
@@ -28,9 +27,8 @@ const entries = await Promise.all(
       start: facts.start,
       end: facts.end,
       when: timelineWhen(facts.start, facts.end, data.whenNote),
-      // The link waits for its page.
       link:
-        facts.href && data.linkLabel && routeExists(facts.href)
+        facts.href && data.linkLabel
           ? { href: facts.href, label: data.linkLabel }
           : undefined,
     };

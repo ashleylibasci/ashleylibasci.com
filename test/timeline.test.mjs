@@ -223,8 +223,8 @@ test('an unknown project fails the build, naming the entry', () => {
   );
 });
 
-test('an inline link needs a label and a built page', () => {
-  assert.match(timeline, /facts\.href && data\.linkLabel && routeExists\(facts\.href\)/);
+test('an inline link needs a target and a label', () => {
+  assert.match(timeline, /facts\.href && data\.linkLabel\s*\? \{ href: facts\.href, label: data\.linkLabel \}\s*: undefined/);
   assert.match(timeline, /\{entry\.link && <Fragment> <a href=\{entry\.link\.href\}>\{entry\.link\.label\}<\/a><\/Fragment>\}/);
   assert.equal(timeline.match(/<a\b/g)?.length, 1);
 });
@@ -255,7 +255,7 @@ test('no drawing and no hover motion', () => {
   }
 });
 
-test('the closing line: the mockup words, addresses from CONTACTS, the resume clause gated', () => {
+test('the closing line: the mockup words, addresses from CONTACTS, the resume link', () => {
   assert.match(closing, /<section class="end" aria-label="Contact">/);
   assert.match(
     closing,
@@ -263,10 +263,9 @@ test('the closing line: the mockup words, addresses from CONTACTS, the resume cl
   );
   assert.match(
     closing,
-    /<p class="alt">Or \{showResume && <Fragment>read my <a href=\{RESUME_HREF\}>resume<\/a>, <\/Fragment>\}look through my <a href=\{CONTACTS\.github\}>GitHub<\/a>, or find me on <a href=\{CONTACTS\.linkedin\}>LinkedIn<\/a>\.<\/p>/,
+    /<p class="alt">Or read my <a href=\{RESUME_HREF\}>resume<\/a>, look through my <a href=\{CONTACTS\.github\}>GitHub<\/a>, or find me on <a href=\{CONTACTS\.linkedin\}>LinkedIn<\/a>\.<\/p>/,
   );
   assert.match(closing, /const RESUME_HREF = '\/about#resume';/);
-  assert.match(closing, /const showResume = routeExists\(RESUME_HREF\);/);
   assert.match(closing, /border-top: 1px solid var\(--color-line\)/);
   assert.equal(/@|https?:/.test(closing.replace(/@media/g, '')), false, 'an address is written in the component');
 });

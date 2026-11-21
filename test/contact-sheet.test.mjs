@@ -148,14 +148,12 @@ test('the sheet takes every word of a print from the collection', () => {
   assert.match(sheet, /source: picture \? undefined : data\.title/);
 });
 
-test('a print links only when its page exists; "All work" waits for /work', () => {
-  assert.match(sheet, /href: routeExists\(data\.href\) \? data\.href : null/);
+test('every print links to its page; "All work" links to /work', () => {
+  assert.match(sheet, /href: data\.href,/);
   assert.match(sheet, /const WORK_HREF = '\/work';/);
-  assert.match(sheet, /\{showAllWork && <a href=\{WORK_HREF\}>All work<\/a>\}/);
-  assert.match(sheet, /const showAllWork = routeExists\(WORK_HREF\)/);
-  // Without an href: no link and no aria-label, so the caption is read.
-  assert.match(print, /const Wrap = href \? 'a' : 'div';/);
-  assert.match(print, /href \? \{ href, 'aria-label': `Frame \$\{number\}: \$\{label\}` \} : \{\}/);
+  assert.match(sheet, /<a href=\{WORK_HREF\}>All work<\/a>/);
+  assert.match(print, /href: string;/);
+  assert.match(print, /<a class="fr" href=\{href\} aria-label=\{`Frame \$\{number\}: \$\{label\}`\}>/);
   assert.equal(print.match(/aria-label/g)?.length, 1);
 });
 
@@ -178,12 +176,12 @@ test('pictures are decorative, lazy and cropped to the square through FramedImag
   assert.equal(/<img\b/.test(print) || /<img\b/.test(sheet), false);
 });
 
-test('the typeset print keeps fixed colors and is hidden inside a link', () => {
+test('the typeset print keeps fixed colors and is hidden inside its link', () => {
   assert.match(print, /background: var\(--color-typeset-print\)/);
   assert.match(print, /color: var\(--color-typeset-ink\)/);
   assert.match(print, /color: var\(--color-typeset-source\)/);
   assert.match(print, /background: var\(--color-typeset-rule\)/);
-  assert.match(print, /aria-hidden=\{href \? 'true' : undefined\}/);
+  assert.match(print, /<span class="ts-in" aria-hidden="true">/);
   const tokens = read('styles', 'tokens.css');
   const [light, dark] = tokens.split('\n:root[data-theme="dark"] {');
   for (const name of ['print', 'ink', 'source', 'rule']) {

@@ -107,9 +107,8 @@ test('no JavaScript: the address is a mail link in the markup itself', () => {
   assert.match(source, /<a href=\{`mailto:\$\{email\}`\}>\{email\}<\/a>/);
 });
 
-test('the Resume button is rendered only when its page exists', () => {
+test('the Resume button links to the Resume section', () => {
   const page = readFileSync(join(island, '..', '..', 'pages', 'index.astro'), 'utf8');
-  assert.match(page, /const showResume = routeExists\(RESUME_HREF\);/);
-  assert.match(page, /\{showResume && <a class="btn" href=\{RESUME_HREF\}>Resume<\/a>\}/);
+  assert.match(page, /<a class="btn" href=\{RESUME_HREF\}>Resume<\/a>/);
   assert.equal([...page.matchAll(/class="btn"/g)].length, 1);
 });

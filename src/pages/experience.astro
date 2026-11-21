@@ -9,7 +9,6 @@ import PageHead from '../components/PageHead.astro';
 import { entryFacts } from '../lib/content-rules';
 import { fillTemplate, formatYear } from '../lib/format';
 import { navItem } from '../lib/nav';
-import { routeExists } from '../lib/routes';
 
 const page = navItem('experience');
 const home = navItem('home');
@@ -37,7 +36,7 @@ const entries = (
           start: facts.start,
           end: facts.end,
           link:
-            facts.href && data.linkLabel && routeExists(facts.href)
+            facts.href && data.linkLabel
               ? { href: facts.href, label: data.linkLabel }
               : undefined,
         },
@@ -60,7 +59,7 @@ const earliest = new Date(Math.min(...starts.map((start) => start.getTime())));
     standfirst={`Everything since ${formatYear(earliest)}, newest first.`}
     crumbs={[{ label: home.label, href: home.href }]}
   >
-    <Fragment slot="links">{routeExists(resumeHref) && <a href={resumeHref}>Resume</a>}</Fragment>
+    <Fragment slot="links"><a href={resumeHref}>Resume</a></Fragment>
   </PageHead>
   <div class="wrap art">
     <ol class="entries">

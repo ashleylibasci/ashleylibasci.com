@@ -3,12 +3,11 @@
 // Placeholder, and the rules the page and its components keep in their source.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONTACTS } from '../src/lib/contacts.ts';
 import { NAV, navItem } from '../src/lib/nav.ts';
-import { matchRoute, pageRoutes } from '../src/lib/route-match.ts';
 
 const src = join(dirname(fileURLToPath(import.meta.url)), '..', 'src');
 const read = (/** @type {string[]} */ ...parts) => readFileSync(join(src, ...parts), 'utf8');
@@ -111,8 +110,10 @@ test('About and Resume close the nav; About is current on the page and Resume ne
   }
   assert.equal(/section=\{resume/.test(page), false);
   // Every nav item points at a page that exists.
-  const routes = pageRoutes(readdirSync(join(src, 'pages')).map((name) => `../pages/${name}`));
-  for (const item of NAV) assert.equal(matchRoute(item.href, routes), true, item.href);
+  for (const item of NAV) {
+    const path = item.href.replace(/#.*$/, '').replace(/^\//, '') || 'index';
+    assert.ok(existsSync(join(src, 'pages', `${path}.astro`)), item.href);
+  }
 });
 
 test('the Resume section sits at the nav item\'s fragment and clears the sticky bar', () => {
@@ -130,6 +131,14 @@ test('the Placeholder: the designed dashed box with the approved line', () => {
   assert.match(placeholder, /\.placeholder \{[^}]*max-width: 42em;\s*padding: var\(--space-5\);\s*border: 1px dashed var\(--color-line-2\);\s*border-radius: var\(--radius-md\);\s*color: var\(--color-ink-3\);/);
   // No resume file and no download link yet.
   assert.equal(/\.pdf|download=/.test(page), false);
+});
+
+test('every PageHead crumb links to its page; the Experience Resume link is always rendered', () => {
+  assert.match(head, /crumbs\.map\(\(step\) => \(\s*<Fragment>\s*<a href=\{step\.href\}>\{step\.label\}<\/a>\s*\{' \/ '\}/);
+  assert.equal(/<span>\{step\.label\}<\/span>/.test(head), false);
+  const experience = read('pages', 'experience.astro');
+  assert.match(experience, /const resumeHref = '\/about#resume';/);
+  assert.match(experience, /<Fragment slot="links"><a href=\{resumeHref\}>Resume<\/a><\/Fragment>/);
 });
 
 test('the About head: the framed headshot through FramedImage, lazy, left of the greeting', () => {

@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
+import { satteri } from '@astrojs/markdown-satteri';
 
 /**
  * Fonts resolve only from installed @fontsource packages, never a CDN (AD-19).
@@ -48,7 +49,7 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   // Copy keeps the straight quotes it is written with, in Markdown as in the pages.
-  markdown: { smartypants: false },
+  markdown: { processor: satteri({ features: { smartPunctuation: false } }) },
   fonts: [
     {
       name: 'Marcellus',

@@ -94,9 +94,9 @@ test('the Work tab is current and no nav item is added', () => {
   );
 });
 
-test('the hero: breadcrumb steps link only when their page exists; the h1 is the focus target', () => {
+test('the hero: every breadcrumb step links to its page; the h1 is the focus target', () => {
   assert.match(page, /\{ label: home\.label, href: home\.href \},\s*\{ label: work\.label, href: work\.href \},/);
-  assert.match(hero, /routeExists\(step\.href\) \? <a href=\{step\.href\}>\{step\.label\}<\/a> : <span>\{step\.label\}<\/span>/);
+  assert.match(hero, /<a href=\{step\.href\}>\{step\.label\}<\/a>\s*\{' \/ '\}/);
   assert.match(hero, /<h1 id="page-heading" tabindex="-1">\{title\}<\/h1>/);
   assert.match(hero, /background: var\(--color-field\);\s*border-bottom: 1px solid var\(--color-hair\);/);
 });

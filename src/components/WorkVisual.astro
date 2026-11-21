@@ -1,8 +1,8 @@
 ---
-// The framed visual of a Work entry: a pale field with a hairline. A link when it is given
-// an href; the same markup without the link otherwise. Three kinds: `app` (the app icon over
-// a heartbeat line beside two phone thumbnails), `plate` (one image on a top-rounded plate)
-// and `typeset` (a source line, a rule and an excerpt on the plate).
+// The framed visual of a Work entry: a pale field with a hairline, linking to the entry's
+// page. Three kinds: `app` (the app icon over a heartbeat line beside two phone
+// thumbnails), `plate` (one image on a top-rounded plate) and `typeset` (a source line,
+// a rule and an excerpt on the plate).
 // The visual is a size container: every inner size scales with its width, up to the size
 // it has on a desktop, so nothing is cut or overlaps at any width.
 import type { ImageMetadata } from 'astro';
@@ -28,8 +28,8 @@ type Visual =
   | { kind: 'typeset'; source: string; text: string };
 
 type Props = Visual & {
-  /** The page this visual opens, or null while that page does not exist. */
-  href: string | null;
+  /** The page this visual opens. */
+  href: string;
   /** Accessible name of the link. Without it the image's alt text names the link. */
   label?: string;
 };
@@ -37,15 +37,15 @@ type Props = Visual & {
 const props = Astro.props;
 const { href, label } = props;
 
-// Shares of the visual's width, matching the styles below.
+// Shares of the visual's width and the widths they stop at, matching the styles below.
 const ICON_SHARE = 0.136;
+const ICON_MAX = 76;
 const THUMB_SHARE = 0.254;
+const THUMB_MAX = 142;
 
-const Wrap = href ? 'a' : 'div';
-const wrapAttrs = href ? { href, 'aria-label': label } : {};
 const share = (value: number) => Math.round(value * 1000) / 1000;
 ---
-<Wrap class:list={['wv', `k-${props.kind}`]} {...wrapAttrs}>
+<a class:list={['wv', `k-${props.kind}`]} href={href} aria-label={label}>
   {
     props.kind === 'app' && (
       <span class="in">
@@ -53,7 +53,7 @@ const share = (value: number) => Math.round(value * 1000) / 1000;
           <FramedImage
             src={props.icon.image}
             alt={props.icon.alt}
-            {...plateImage(props.icon.image.width, ICON_SHARE)}
+            {...plateImage(props.icon.image.width, ICON_SHARE, ICON_MAX)}
             class="icon"
           />
           <svg class="beat" viewBox="0 0 480 84" aria-hidden="true" focusable="false" preserveAspectRatio="none">
@@ -65,7 +65,7 @@ const share = (value: number) => Math.round(value * 1000) / 1000;
             <FramedImage
               src={screen.image}
               alt={screen.alt}
-              {...plateImage(screen.image.width, THUMB_SHARE)}
+              {...plateImage(screen.image.width, THUMB_SHARE, THUMB_MAX)}
               class="thumb"
             />
           ))}
@@ -91,14 +91,14 @@ const share = (value: number) => Math.round(value * 1000) / 1000;
   {
     props.kind === 'typeset' && (
       <span class="in">
-        <span class="plate" aria-hidden={href && label ? 'true' : undefined}>
+        <span class="plate" aria-hidden={label ? 'true' : undefined}>
           <span class="ts-src">{props.source}</span>
           <span class="ts-text">{props.text}</span>
         </span>
       </span>
     )
   }
-</Wrap>
+</a>
 
 <style>
   /* The frame. Its height is 6.3/12 of its width, or its content's when that is taller. */

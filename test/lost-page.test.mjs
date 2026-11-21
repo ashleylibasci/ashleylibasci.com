@@ -6,7 +6,6 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NAV, SITE_NAME, navItem } from '../src/lib/nav.ts';
-import { pageRoutes } from '../src/lib/route-match.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const page = readFileSync(join(root, 'src', 'pages', '404.astro'), 'utf8');
@@ -16,7 +15,6 @@ const markup = body.split('<style>')[0];
 test('the page file is 404.astro, so the build writes dist/404.html', () => {
   assert.ok(readdirSync(join(root, 'src', 'pages')).includes('404.astro'));
   assert.match(readFileSync(join(root, 'astro.config.mjs'), 'utf8'), /build: \{ format: 'file' \}/);
-  assert.ok(pageRoutes(['../pages/404.astro']).has('/404'));
 });
 
 test('the copy is the two approved lines and the link home, word for word', () => {

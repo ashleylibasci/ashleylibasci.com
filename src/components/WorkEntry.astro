@@ -1,13 +1,13 @@
 ---
 // Work entry: one project on the Work page. Text on the left (title, tag line, summary,
-// links), one framed visual on the right, given in the default slot. The title is a link
-// when it is given an href; the same markup without the link otherwise.
+// links), one framed visual on the right, given in the default slot. The title links to
+// the entry's page.
 import type { Status, TemplatePart } from '../lib/format';
 
 interface Props {
   title: string;
-  /** The page this entry opens, or null while that page does not exist. */
-  href: string | null;
+  /** The page this entry opens. */
+  href: string;
   /** The tag line, split at its tokens so the status words can be styled. */
   tag: readonly TemplatePart[];
   status: Status;
@@ -21,7 +21,7 @@ const current = (part: TemplatePart) => part.token === 'status' && status === 'b
 ---
 <article class="g12">
   <div class="wt">
-    <h2>{href ? <a href={href}>{title}</a> : title}</h2>
+    <h2><a href={href}>{title}</a></h2>
     <p class="tag">{tag.map((part) => (current(part) ? <span class="cur">{part.text}</span> : part.text))}</p>
     <p class="b">{summary}</p>
     {links.length > 0 && <p class="meta">{links.map((link) => <a href={link.href}>{link.label}</a>)}</p>}

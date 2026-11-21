@@ -10,7 +10,6 @@ import WorkEntry from '../components/WorkEntry.astro';
 import WorkVisual from '../components/WorkVisual.astro';
 import { fillTemplate, templateParts } from '../lib/format';
 import { navItem } from '../lib/nav';
-import { routeExists } from '../lib/routes';
 import healthIcon from '../assets/healthdash-icon.png';
 import healthSleep from '../assets/healthdash-sleep.jpg';
 import healthFitness from '../assets/healthdash-fitness.jpg';
@@ -59,8 +58,7 @@ const entries = projects.map(({ id, data }) => {
   if (!picture) {
     throw new Error(`work: the project entry "${id}" has neither a picture nor a work.plate`);
   }
-  // The links wait for their page.
-  const href = routeExists(data.href) ? data.href : null;
+  const href = data.href;
   return {
     title: data.title,
     href,
@@ -68,7 +66,7 @@ const entries = projects.map(({ id, data }) => {
     status: data.status,
     summary: data.summary,
     links: [
-      ...(href ? [{ href, label: data.work.linkLabel }] : []),
+      { href, label: data.work.linkLabel },
       ...(data.liveUrl ? [{ href: data.liveUrl, label: LIVE_LABEL }] : []),
     ],
     visual: { ...picture, href, label: data.work.visualLabel },

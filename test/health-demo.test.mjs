@@ -194,10 +194,10 @@ test('hidden math styles: one grid cell, a --t fade on hover or focus, no script
   assert.equal(/beat-f|rule-wrap|beat-hit/.test(read('health-demo.ts')), false, 'the swap needs no script');
 });
 
-test('the title and the Placard link are links only when the page exists', () => {
+test('the title and the Placard link go to the project page', () => {
   const page = readFileSync(join(island, '..', '..', 'pages', 'index.astro'), 'utf8');
-  assert.match(page, /const healthHref = routeExists\(health\.data\.href\) \? health\.data\.href : null;/);
-  assert.match(page, /\{healthHref \? <a href=\{healthHref\}>\{health\.data\.title\}<\/a> : health\.data\.title\}/);
-  assert.match(page, /\{healthHref && <>\{' '\}<a href=\{healthHref\}>How I'm building it<\/a><\/>\}/);
+  assert.match(page, /const healthHref = health\.data\.href;/);
+  assert.match(page, /<h2 id="h-now"><a href=\{healthHref\}>\{health\.data\.title\}<\/a><\/h2>/);
+  assert.match(page, /Getting ready for TestFlight\. <a href=\{healthHref\}>How I'm building it<\/a>/);
   assert.equal([...page.matchAll(/href=\{healthHref\}/g)].length, 2);
 });

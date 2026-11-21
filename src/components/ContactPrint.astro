@@ -1,7 +1,7 @@
 ---
 // Contact print: one numbered square print on the Contact sheet, with its caption.
-// A link when it is given an href; the same markup without the link otherwise.
-// It shows a picture cropped to the square, or a typeset note when there is none.
+// The whole print is a link to its page. It shows a picture cropped to the square, or a
+// typeset note when there is none.
 import type { ImageMetadata } from 'astro';
 import FramedImage from './FramedImage.astro';
 import { printImage } from '../lib/print-image';
@@ -13,8 +13,8 @@ interface Props {
   meta: string;
   /** Accessible name of the link, after "Frame n:". */
   label: string;
-  /** The page this print opens, or null while that page does not exist. */
-  href: string | null;
+  /** The page this print opens. */
+  href: string;
   image?: ImageMetadata;
   /** object-position of the crop. */
   position?: string;
@@ -26,11 +26,9 @@ interface Props {
 const { number, name, meta, label, href, image, position, note, source } = Astro.props;
 if (!image && !note) throw new Error(`ContactPrint: frame ${number} has neither a picture nor a note`);
 
-const Wrap = href ? 'a' : 'div';
-const wrapAttrs = href ? { href, 'aria-label': `Frame ${number}: ${label}` } : {};
 const picture = image ? printImage(image.width, image.height) : null;
 ---
-<Wrap class="fr" {...wrapAttrs}>
+<a class="fr" href={href} aria-label={`Frame ${number}: ${label}`}>
   <span class="pr">
     {
       image && picture ? (
@@ -46,7 +44,7 @@ const picture = image ? printImage(image.width, image.height) : null;
         </span>
       ) : (
         <span class="im typeset">
-          <span class="ts-in" aria-hidden={href ? 'true' : undefined}>
+          <span class="ts-in" aria-hidden="true">
             {source && <span class="ts-src">{source}</span>}
             <span class="ts-note">{note}</span>
           </span>
@@ -59,7 +57,7 @@ const picture = image ? printImage(image.width, image.height) : null;
     <span class="ft">{name}</span>
     <span class="fm">{meta}</span>
   </span>
-</Wrap>
+</a>
 
 <style>
   .fr {

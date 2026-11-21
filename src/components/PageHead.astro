@@ -3,7 +3,6 @@
 // The standfirst is the `standfirst` text or, for Markdown HTML, the `standfirst` slot.
 // The title is the skip-link and page-load focus target. The About head passes a framed
 // photo in the `photo` slot: it sits left of the text, and above it on phones.
-import { routeExists } from '../lib/routes';
 
 interface Props {
   title: string;
@@ -26,7 +25,7 @@ const photo = Astro.slots.has('photo') ? (await Astro.slots.render('photo')).tri
       {
         crumbs.map((step) => (
           <Fragment>
-            {routeExists(step.href) ? <a href={step.href}>{step.label}</a> : <span>{step.label}</span>}
+            <a href={step.href}>{step.label}</a>
             {' / '}
           </Fragment>
         ))

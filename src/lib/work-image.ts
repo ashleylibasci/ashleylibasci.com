@@ -25,22 +25,27 @@ export interface PlateImage {
 
 /**
  * `widths` and `sizes` for an original `width` px wide, drawn at `scale` times the
- * visual's width (1 by default). No width goes above the original.
+ * visual's width (1 by default) and, when `max` is given, never wider than `max` px.
+ * No width goes above the original, or above `max` at 3x.
  */
-export function plateImage(width: number, scale: number = 1): PlateImage {
+export function plateImage(width: number, scale: number = 1, max?: number): PlateImage {
   if (!(Number.isInteger(width) && width > 0)) throw new Error(`work-image: ${width} is not an image width`);
   if (!(Number.isFinite(scale) && scale > 0)) throw new Error(`work-image: ${scale} is not a scale`);
+  if (max !== undefined && !(Number.isFinite(max) && max > 0)) throw new Error(`work-image: ${max} is not a width cap`);
 
+  const top = max === undefined ? width : Math.min(width, Math.round(max * DENSITIES[DENSITIES.length - 1]));
   const all = VISUALS.flatMap((visual) => DENSITIES.map((density) => Math.round(visual * density * scale)));
-  const capped = all.map((w) => Math.min(w, width));
+  const capped = all.map((w) => Math.min(w, top));
   const widths = [...new Set(capped)].sort((a, b) => a - b);
 
   const fluid = (visual: string) => (scale === 1 ? `calc(${visual})` : `calc((${visual}) * ${scale})`);
+  const bound = (value: string) => (max === undefined ? value : `min(${value}, ${max}px)`);
+  const full = Math.round(VISUAL_FULL * scale);
   const sizes = [
-    `(max-width: 760px) ${fluid(VISUAL_MOBILE)}`,
-    `(max-width: 1060px) ${fluid(VISUAL_TABLET)}`,
-    `(max-width: 1271px) ${fluid(VISUAL_DESKTOP)}`,
-    `${Math.round(VISUAL_FULL * scale)}px`,
+    `(max-width: 760px) ${bound(fluid(VISUAL_MOBILE))}`,
+    `(max-width: 1060px) ${bound(fluid(VISUAL_TABLET))}`,
+    `(max-width: 1271px) ${bound(fluid(VISUAL_DESKTOP))}`,
+    `${max === undefined ? full : Math.min(full, max)}px`,
   ].join(', ');
 
   return { widths, sizes };

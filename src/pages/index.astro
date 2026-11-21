@@ -9,17 +9,15 @@ import Timeline from '../components/Timeline.astro';
 import ClosingLine from '../components/ClosingLine.astro';
 import HealthDemo from '../islands/health-demo/HealthDemo.astro';
 import { CONTACTS } from '../lib/contacts';
-import { routeExists } from '../lib/routes';
 import headshot from '../assets/headshot-full.jpg';
 import healthIcon from '../assets/healthdash-icon.png';
 
 const RESUME_HREF = '/about#resume';
-const showResume = routeExists(RESUME_HREF);
 
-// The print's title and link target are facts of the project; the link waits for its page.
+// The print's title and link target are facts of the project.
 const health = await getEntry('projects', 'health-dashboard');
 if (!health) throw new Error('index: the health-dashboard project entry is missing');
-const healthHref = routeExists(health.data.href) ? health.data.href : null;
+const healthHref = health.data.href;
 ---
 <Base section="home">
   <div class="first wrap">
@@ -41,7 +39,7 @@ const healthHref = routeExists(health.data.href) ? health.data.href : null;
         </div>
         <p class="seek">I'm looking for a software engineering, cybersecurity or quant internship for summer&nbsp;2027.</p>
         <div class="acts">
-          {showResume && <a class="btn" href={RESUME_HREF}>Resume</a>}
+          <a class="btn" href={RESUME_HREF}>Resume</a>
           <CopyEmail email={CONTACTS.email} />
           <span class="soc"><a href={CONTACTS.github}>GitHub</a><a href={CONTACTS.linkedin}>LinkedIn</a></span>
         </div>
@@ -54,7 +52,7 @@ const healthHref = routeExists(health.data.href) ? health.data.href : null;
               <FramedImage src={healthIcon} alt="" widths={[48, 96, 144]} sizes="48px" class="now-icon" />
               <div>
                 <p class="now-k">What I'm building now</p>
-                <h2 id="h-now">{healthHref ? <a href={healthHref}>{health.data.title}</a> : health.data.title}</h2>
+                <h2 id="h-now"><a href={healthHref}>{health.data.title}</a></h2>
               </div>
             </div>
             <p class="now-d">A sleep and recovery app for iPhone and Apple Watch, written in Swift. The data stays on the device.</p>
@@ -64,7 +62,7 @@ const healthHref = routeExists(health.data.href) ? health.data.href : null;
         <p class="placard">
           <span class="pl-t">A working preview</span>
           <span class="pl-m">2026 · Swift · iPhone and Apple Watch</span>
-          <span class="pl-d">Getting ready for TestFlight.{healthHref && <>{' '}<a href={healthHref}>How I'm building it</a></>}</span>
+          <span class="pl-d">Getting ready for TestFlight. <a href={healthHref}>How I'm building it</a></span>
         </p>
       </div>
     </section>

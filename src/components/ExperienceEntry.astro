@@ -9,7 +9,7 @@ interface Props {
   description?: string;
   start?: Date;
   end?: Date;
-  /** A link shown after the description; pass it only when the page exists. */
+  /** A link shown after the description; none when the entry has no target or label. */
   link?: { href: string; label: string };
   /** Wrapper element: a list item by default. */
   as?: 'li' | 'div';

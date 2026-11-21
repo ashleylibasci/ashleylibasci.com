@@ -1,16 +1,14 @@
 ---
 // The closing line of the home page: a hairline, the invitation with the email address,
-// then the other ways in. Addresses come from CONTACTS; the resume clause waits for its page.
+// then the other ways in. Addresses come from CONTACTS.
 import { CONTACTS } from '../lib/contacts';
-import { routeExists } from '../lib/routes';
 
 const RESUME_HREF = '/about#resume';
-const showResume = routeExists(RESUME_HREF);
 ---
 <section class="end" aria-label="Contact">
   <div class="wrap g12">
     <p class="msg">Hiring interns for summer 2027? Email is the fastest way to reach me: <a href={`mailto:${CONTACTS.email}`}>{CONTACTS.email}</a></p>
-    <p class="alt">Or {showResume && <Fragment>read my <a href={RESUME_HREF}>resume</a>, </Fragment>}look through my <a href={CONTACTS.github}>GitHub</a>, or find me on <a href={CONTACTS.linkedin}>LinkedIn</a>.</p>
+    <p class="alt">Or read my <a href={RESUME_HREF}>resume</a>, look through my <a href={CONTACTS.github}>GitHub</a>, or find me on <a href={CONTACTS.linkedin}>LinkedIn</a>.</p>
   </div>
 </section>
 
