@@ -1,14 +1,22 @@
 ---
+import { getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PrintFrame from '../components/PrintFrame.astro';
 import FramedImage from '../components/FramedImage.astro';
 import CopyEmail from '../islands/copy-email/CopyEmail.astro';
+import HealthDemo from '../islands/health-demo/HealthDemo.astro';
 import { CONTACTS } from '../lib/contacts';
 import { routeExists } from '../lib/routes';
 import headshot from '../assets/headshot-full.jpg';
+import healthIcon from '../assets/healthdash-icon.png';
 
 const RESUME_HREF = '/about#resume';
 const showResume = routeExists(RESUME_HREF);
+
+// The print's title and link target are facts of the project; the link waits for its page.
+const health = await getEntry('projects', 'health-dashboard');
+if (!health) throw new Error('index: the health-dashboard project entry is missing');
+const healthHref = routeExists(health.data.href) ? health.data.href : null;
 ---
 <Base section="home">
   <div class="first wrap">
@@ -35,6 +43,27 @@ const showResume = routeExists(RESUME_HREF);
           <span class="soc"><a href={CONTACTS.github}>GitHub</a><a href={CONTACTS.linkedin}>LinkedIn</a></span>
         </div>
       </div>
+
+      <div class="nowx">
+        <PrintFrame>
+          <section class="now" aria-labelledby="h-now">
+            <div class="now-head">
+              <FramedImage src={healthIcon} alt="" widths={[48, 96, 144]} sizes="48px" class="now-icon" />
+              <div>
+                <p class="now-k">What I'm building now</p>
+                <h2 id="h-now">{healthHref ? <a href={healthHref}>{health.data.title}</a> : health.data.title}</h2>
+              </div>
+            </div>
+            <p class="now-d">A sleep and recovery app for iPhone and Apple Watch, written in Swift. The data stays on the device.</p>
+            <HealthDemo />
+          </section>
+        </PrintFrame>
+        <p class="placard">
+          <span class="pl-t">A working preview</span>
+          <span class="pl-m">2026 · Swift · iPhone and Apple Watch</span>
+          <span class="pl-d">Getting ready for TestFlight.{healthHref && <>{' '}<a href={healthHref}>How I'm building it</a></>}</span>
+        </p>
+      </div>
     </section>
   </div>
 </Base>
@@ -55,7 +84,6 @@ const showResume = routeExists(RESUME_HREF);
     align-items: center;
   }
 
-  /* Columns 8 to 12 stay empty until the Health Dashboard print hangs there. */
   .me {
     grid-column: 1 / 8;
     padding-right: var(--space-7);
@@ -108,6 +136,93 @@ const showResume = routeExists(RESUME_HREF);
     margin-top: var(--space-6);
     max-width: 26em;
     text-wrap: balance;
+  }
+
+  /* The Health Dashboard print hangs in columns 8 to 12, its Placard under it. */
+  .nowx {
+    grid-column: 8 / 13;
+    min-width: 0;
+  }
+
+  .now {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-field);
+    color: var(--color-ink);
+    border-radius: var(--radius-hairline);
+    padding: 26px var(--space-5) 22px;
+  }
+
+  .now-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .now-head .now-icon {
+    --pw: 48px;
+    flex: none;
+    border-radius: var(--radius-sm);
+  }
+
+  .now-k {
+    font: var(--type-meta);
+    letter-spacing: 0.01em;
+    color: var(--color-teal-text);
+  }
+
+  .now h2 {
+    font: var(--type-panel-title);
+    font-variant-numeric: lining-nums;
+    margin-top: 2px;
+  }
+
+  .now h2 a {
+    color: var(--color-ink);
+    text-decoration-color: transparent;
+    text-underline-offset: 5px;
+  }
+
+  .now h2 a:hover {
+    color: var(--color-ink);
+    text-decoration-color: var(--color-aqua);
+  }
+
+  .now-d {
+    margin-top: var(--space-3);
+    font: var(--type-ui);
+    color: var(--color-ink-2);
+  }
+
+  .placard {
+    margin-top: 14px;
+  }
+
+  .pl-t {
+    display: block;
+    font: var(--type-print-title);
+    font-variant-numeric: lining-nums;
+    color: var(--color-ink);
+  }
+
+  .pl-m {
+    display: block;
+    margin-top: 3px;
+    font: var(--type-caption);
+    color: var(--color-ink-3);
+  }
+
+  .pl-d {
+    display: block;
+    margin-top: 5px;
+    font: var(--type-label);
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+
+  .pl-d a {
+    white-space: nowrap;
   }
 
   .acts {
@@ -169,6 +284,11 @@ const showResume = routeExists(RESUME_HREF);
       padding-right: 0;
     }
 
+    .nowx {
+      grid-column: 1 / -1;
+      margin-top: var(--space-7);
+    }
+
     h1 {
       font: var(--type-name-tablet);
       letter-spacing: var(--type-name-tablet-tracking);
@@ -215,6 +335,14 @@ const showResume = routeExists(RESUME_HREF);
 
     .acts {
       gap: var(--space-3) var(--space-5);
+    }
+
+    .now {
+      padding: var(--space-5) 20px 18px;
+    }
+
+    .now h2 {
+      font-size: 29px;
     }
 
     .soc a {

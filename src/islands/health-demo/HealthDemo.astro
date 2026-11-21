@@ -1,0 +1,420 @@
+---
+// The Health Dashboard Demo (AD-5 island): Exam night and On the phone.
+// The markup is the default answer, worked out at build, so it reads correctly
+// without the script. The client script imports nothing outside this folder.
+import type { ImageMetadata } from 'astro';
+import FramedImage from '../../components/FramedImage.astro';
+import sleepShot from '../../assets/healthdash-sleep.jpg';
+import fitnessShot from '../../assets/healthdash-fitness.jpg';
+import {
+  DEFAULT_EXAM,
+  DEFAULT_MODE,
+  DEFAULT_SCREEN,
+  EXAMS,
+  MODES,
+  SCREENS,
+  clock,
+  plan,
+  type Screen,
+} from './demo-core.ts';
+
+const answer = plan(DEFAULT_EXAM, DEFAULT_MODE);
+const outputs = [
+  { name: 'wake', label: 'Wake up', ...clock(answer.wake) },
+  { name: 'bed', label: 'Bed by', ...clock(answer.bed) },
+];
+
+const SHOTS = {
+  sleep: {
+    src: sleepShot,
+    alt: "Sleep tab: 7 hours 21 minutes last night, 39 minutes short of an 8 hour need, and tonight's plan to be in bed by 11:50 p.m. and up at 8:30 a.m.",
+  },
+  fit: {
+    src: fitnessShot,
+    alt: "Fitness tab: Keep it easy, with a recovery of 68, and today's session timed so it's done early for a BIOL 210 exam at 8 a.m. tomorrow.",
+  },
+} satisfies Record<Screen, { src: ImageMetadata; alt: string }>;
+
+const defaultCaption = SCREENS.find((screen) => screen.value === DEFAULT_SCREEN)?.caption ?? '';
+---
+<div class="demo" data-health-demo>
+  <div class="dtabs" role="tablist" aria-label="Health Dashboard preview">
+    <button class="dtab" type="button" role="tab" id="hd-tab-exam" aria-selected="true" aria-controls="hd-panel-exam">Exam night</button>
+    <button class="dtab" type="button" role="tab" id="hd-tab-phone" aria-selected="false" aria-controls="hd-panel-phone" tabindex="-1">On the phone</button>
+  </div>
+  <div class="dpanels">
+    <div class="dpanel" role="tabpanel" id="hd-panel-exam" aria-labelledby="hd-tab-exam" data-panel="exam">
+      <div class="demo-body">
+        <div class="picks">
+          <div class="pick">
+            <span class="pick-l" id="hd-label-exam">Exam starts at</span>
+            <div class="segs" role="radiogroup" aria-labelledby="hd-label-exam">
+              {EXAMS.map((exam) => (
+                <label class="seg"><input type="radio" name="hd-exam" data-choice="exam" value={exam.value} checked={exam.value === DEFAULT_EXAM} /><span>{exam.label}</span></label>
+              ))}
+            </div>
+          </div>
+          <div class="pick">
+            <span class="pick-l" id="hd-label-mode">Alarm mode</span>
+            <div class="segs" role="radiogroup" aria-labelledby="hd-label-mode">
+              {MODES.map((mode) => (
+                <label class="seg"><input type="radio" name="hd-mode" data-choice="mode" value={mode.value} checked={mode.value === DEFAULT_MODE} /><span>{mode.label}</span></label>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div class="out" aria-live="polite" aria-atomic="true">
+          {outputs.map((output) => (
+            <p>{output.label}<b><span data-out={`${output.name}-time`}>{output.time}</span><small>{' '}<span data-out={`${output.name}-period`}>{output.period}</span></small></b></p>
+          ))}
+        </div>
+      </div>
+      <svg class="beat" viewBox="0 0 480 32" aria-hidden="true" focusable="false" preserveAspectRatio="none">
+        <path class="trace" data-trace pathLength="1" d="M2 20 H186 L208 25 L238 3 L268 30 L290 20 H478" />
+      </svg>
+      <p class="rule">Simplified rule: wake 90 min before the exam (Most sleep: 30 min later). Bed by = wake-up − 8 h of sleep − 15 min to fall asleep.</p>
+    </div>
+    <div class="dpanel ph" role="tabpanel" id="hd-panel-phone" aria-labelledby="hd-tab-phone" data-panel="phone" hidden>
+      <figure class="phone-mini">
+        {SCREENS.map((screen) => (
+          <FramedImage
+            src={SHOTS[screen.value].src}
+            alt={SHOTS[screen.value].alt}
+            widths={[112, 124, 224, 248, 336, 372]}
+            sizes="(max-width: 760px) 112px, 124px"
+            class={screen.value === DEFAULT_SCREEN ? 'shot on' : 'shot'}
+            data-screen={screen.value}
+            aria-hidden={screen.value === DEFAULT_SCREEN ? undefined : 'true'}
+          />
+        ))}
+      </figure>
+      <div class="pick">
+        <span class="pick-l" id="hd-label-screen">Screen</span>
+        <div class="segs" role="radiogroup" aria-labelledby="hd-label-screen">
+          {SCREENS.map((screen) => (
+            <label class="seg"><input type="radio" name="hd-screen" data-choice="screen" value={screen.value} checked={screen.value === DEFAULT_SCREEN} /><span>{screen.label}</span></label>
+          ))}
+        </div>
+      </div>
+      <p class="ph-cap" data-caption aria-live="polite">{defaultCaption}</p>
+      <p class="ph-note">Real screenshots from the iPhone app. Example data, not my readings.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import './health-demo.ts';
+</script>
+
+<style>
+  .demo {
+    position: relative;
+    overflow: hidden;
+    margin-top: var(--space-4);
+    background: var(--color-surface);
+    border-radius: var(--radius-sheet);
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    container-type: inline-size;
+  }
+
+  /* Tabs */
+  .dtabs {
+    display: flex;
+    gap: var(--space-5);
+    border-bottom: 1px solid var(--color-line);
+    margin-bottom: var(--space-3);
+  }
+
+  .dtab {
+    position: relative;
+    font: var(--type-button-small);
+    color: var(--color-ink-3);
+    background: none;
+    border: 0;
+    padding: 6px 0 10px;
+    cursor: pointer;
+    transition: color var(--t) ease-out;
+  }
+
+  .dtab::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1.5px;
+    background: var(--color-aqua);
+    transform: scaleX(0);
+    transition: transform var(--t) var(--ease);
+  }
+
+  .dtab:hover {
+    color: var(--color-ink);
+  }
+
+  .dtab[aria-selected='true'] {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+
+  .dtab[aria-selected='true']::after {
+    transform: scaleX(1);
+  }
+
+  /* Both panels share one cell and the hidden one keeps its space, so a tab never changes the height. */
+  .dpanels {
+    display: grid;
+  }
+
+  .dpanel {
+    grid-area: 1 / 1;
+    min-width: 0;
+    opacity: 1;
+    transition: opacity var(--t) ease-out;
+  }
+
+  .dpanel[hidden] {
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  /* Exam night */
+  .demo-body {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3) 18px;
+    align-items: start;
+  }
+
+  .pick + .pick {
+    margin-top: var(--space-3);
+  }
+
+  .pick-l {
+    display: block;
+    margin-bottom: 6px;
+    font: var(--type-small);
+    color: var(--color-ink-3);
+  }
+
+  /* Choice segments: real radios, the whole pill is the hit area. */
+  .segs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .seg {
+    position: relative;
+    display: block;
+  }
+
+  .seg input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .seg span {
+    display: block;
+    font: var(--type-segment);
+    color: var(--color-ink-2);
+    background: transparent;
+    border: 1px solid var(--color-seg);
+    border-radius: var(--radius-full);
+    padding: 7px 11px;
+    transition:
+      color var(--t) ease-out,
+      background-color var(--t) ease-out,
+      border-color var(--t) ease-out;
+  }
+
+  .seg:hover span {
+    color: var(--color-ink);
+    border-color: var(--color-teal-soft);
+    background: var(--color-page);
+  }
+
+  .seg input:checked + span {
+    background: var(--color-toggle-on);
+    color: var(--color-ink);
+    border-color: var(--color-toggle-on-line);
+  }
+
+  .seg input:focus-visible + span {
+    outline: 1.5px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .out {
+    display: grid;
+    gap: var(--space-3);
+    padding-left: 18px;
+    border-left: 1px solid var(--color-line);
+  }
+
+  .out p {
+    font: var(--type-small);
+    color: var(--color-ink-3);
+  }
+
+  .out b {
+    display: block;
+    margin-top: 6px;
+    font: var(--type-numeral);
+    font-variant-numeric: tabular-nums lining-nums;
+    color: var(--color-ink);
+    white-space: nowrap;
+  }
+
+  .out b small {
+    font: var(--type-caption);
+    color: var(--color-ink-2);
+  }
+
+  /* A narrow Demo: the answers sit under the choices instead of beside them. */
+  @container (max-width: 350px) {
+    .demo-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .out {
+      grid-template-columns: 1fr 1fr;
+      padding: var(--space-3) 0 0;
+      border-left: 0;
+      border-top: 1px solid var(--color-line);
+    }
+  }
+
+  /* The one autoplaying moment: the trace draws once on load, then holds still.
+     A change on Exam night redraws it quickly. base.css turns both off under reduced motion,
+     which leaves the line fully drawn. */
+  .beat {
+    overflow: visible;
+    width: 100%;
+    height: auto;
+    margin: var(--space-3) 0 var(--space-2);
+  }
+
+  .trace {
+    fill: none;
+    stroke: var(--color-trace);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    animation: hd-trace 1.6s cubic-bezier(0.35, 0.55, 0.25, 1) 0.25s both;
+  }
+
+  .trace.again {
+    animation: hd-trace-again 0.5s ease-out both;
+  }
+
+  @keyframes hd-trace {
+    from {
+      stroke-dashoffset: 1;
+    }
+
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes hd-trace-again {
+    from {
+      stroke-dashoffset: 1;
+    }
+
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .rule {
+    font: var(--type-small);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-ink-3);
+    text-wrap: pretty;
+  }
+
+  /* On the phone */
+  .ph {
+    --phw: 124px;
+    position: relative;
+    padding-left: calc(var(--phw) + var(--space-5));
+  }
+
+  .phone-mini {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: var(--phw);
+    aspect-ratio: 506 / 1100;
+    border: 4px solid var(--color-device-bezel);
+    border-radius: 20px;
+    background: var(--color-device-bezel);
+    overflow: hidden;
+  }
+
+  .phone-mini .shot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity var(--t) ease-out;
+  }
+
+  .phone-mini .shot.on {
+    opacity: 1;
+  }
+
+  .ph-cap {
+    margin-top: var(--space-3);
+    font: var(--type-label);
+    color: var(--color-ink);
+    min-height: 4.5em;
+  }
+
+  .ph-note {
+    margin-top: var(--space-2);
+    font: var(--type-small);
+    color: var(--color-ink-3);
+  }
+
+  @media (max-width: 760px) {
+    .demo {
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .demo-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .out {
+      grid-template-columns: 1fr 1fr;
+      padding: var(--space-3) 0 0;
+      border-left: 0;
+      border-top: 1px solid var(--color-line);
+    }
+
+    .out b {
+      font-size: clamp(27px, 8vw, 31px);
+    }
+
+    .ph {
+      --phw: 112px;
+      padding-left: calc(var(--phw) + var(--space-4));
+    }
+  }
+</style>
