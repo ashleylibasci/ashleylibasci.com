@@ -1,4 +1,5 @@
 ---
+import { CONTACTS } from '../lib/contacts';
 import { NAV, SITE_NAME } from '../lib/nav';
 import MenuSheet from '../islands/menu-sheet/MenuSheet.astro';
 import ThemeToggle from '../islands/theme-toggle/ThemeToggle.astro';
@@ -26,7 +27,7 @@ const tabs = NAV.filter((item) => item.tab);
         )
       }
       <div class="theme-slot" data-slot="theme-toggle"><ThemeToggle /></div>
-      <MenuSheet items={NAV} section={section} siteName={SITE_NAME}>
+      <MenuSheet items={NAV} section={section} siteName={SITE_NAME} email={CONTACTS.email}>
         <ThemeToggle slot="theme" />
       </MenuSheet>
     </div>

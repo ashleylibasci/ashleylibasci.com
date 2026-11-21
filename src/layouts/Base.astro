@@ -37,7 +37,7 @@ const fullTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
     <Font cssVariable="--font-marcellus" preload={[{ weight: 400, style: 'normal' }]} />
     <Font cssVariable="--font-albert-sans" preload={[{ weight: 400, style: 'normal' }]} />
   </head>
-  <body>
+  <body class:list={[{ 'on-home': section === 'home' }]}>
     <a class="skip" href="#page-heading">Skip to content</a>
     <Header section={section} />
     <main id="main">

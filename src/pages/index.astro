@@ -2,34 +2,69 @@
 import Base from '../layouts/Base.astro';
 import PrintFrame from '../components/PrintFrame.astro';
 import FramedImage from '../components/FramedImage.astro';
+import CopyEmail from '../islands/copy-email/CopyEmail.astro';
+import { CONTACTS } from '../lib/contacts';
+import { routeExists } from '../lib/routes';
 import headshot from '../assets/headshot-full.jpg';
+
+const RESUME_HREF = '/about#resume';
+const showResume = routeExists(RESUME_HREF);
 ---
 <Base section="home">
-  <div class="wrap intro">
-    <div class="id">
-      <PrintFrame class="pic">
-        <FramedImage
-          src={headshot}
-          alt="Ashley Libasci"
-          widths={[130, 160, 216, 260, 320, 432, 480, 648]}
-          sizes="(max-width: 760px) clamp(130px, 40vw, 160px), clamp(190px, 15vw, 216px)"
-          position="48% 30%"
-          eager
-        />
-      </PrintFrame>
-      <h1 id="page-heading" tabindex="-1">Ashley Libasci</h1>
-      <p class="line">Portfolio coming soon.</p>
-    </div>
+  <div class="first wrap">
+    <section class="hero g12" aria-labelledby="page-heading">
+      <div class="me">
+        <div class="id">
+          <h1 id="page-heading" tabindex="-1">Ashley Libasci</h1>
+          <PrintFrame class="pic">
+            <FramedImage
+              src={headshot}
+              alt="Ashley Libasci"
+              widths={[130, 160, 216, 260, 320, 432, 480, 648]}
+              sizes="(max-width: 760px) clamp(130px, 40vw, 160px), clamp(190px, 15vw, 216px)"
+              position="48% 30%"
+              eager
+            />
+          </PrintFrame>
+          <p class="intro">I study math and computer science at the University of Illinois Urbana-Champaign, with a statistics minor, class of 2028. I like problems where you can check the answer, and I like shipping the thing once it works.</p>
+        </div>
+        <p class="seek">I'm looking for a software engineering, cybersecurity or quant internship for summer&nbsp;2027.</p>
+        <div class="acts">
+          {showResume && <a class="btn" href={RESUME_HREF}>Resume</a>}
+          <CopyEmail email={CONTACTS.email} />
+          <span class="soc"><a href={CONTACTS.github}>GitHub</a><a href={CONTACTS.linkedin}>LinkedIn</a></span>
+        </div>
+      </div>
+    </section>
   </div>
 </Base>
 
 <style>
-  .intro {
-    padding-top: var(--space-8);
-    padding-bottom: var(--space-8);
+  /* The first screen is one page: header plus hero fill the viewport, the content centered inside it. */
+  .first {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - var(--nav) - 1px);
+    min-height: calc(100svh - var(--nav) - 1px);
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-6);
   }
 
-  /* The photo on the left, the name centered on the photo's middle with the line under it. */
+  .hero {
+    align-items: center;
+  }
+
+  /* Columns 8 to 12 stay empty until the Health Dashboard print hangs there. */
+  .me {
+    grid-column: 1 / 8;
+    padding-right: var(--space-7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* The photo on the left, the name centered on the photo's middle with the intro under it. */
   .id {
     --pw: clamp(190px, 15vw, 216px);
     display: grid;
@@ -37,7 +72,7 @@ import headshot from '../assets/headshot-full.jpg';
     grid-template-areas:
       'pic .'
       'pic name'
-      'pic line'
+      'pic intro'
       'pic .';
     grid-template-rows: 1fr auto auto 1fr;
     column-gap: calc(var(--space-5) + var(--space-3));
@@ -48,19 +83,92 @@ import headshot from '../assets/headshot-full.jpg';
     grid-area: pic;
   }
 
+  /* The name always stays on one line. */
   h1 {
     grid-area: name;
     color: var(--color-ink);
     font: var(--type-name);
     letter-spacing: var(--type-name-tracking);
-    margin-bottom: var(--space-4);
+    white-space: nowrap;
+    margin: -5px 0 var(--space-4);
   }
 
-  .line {
-    grid-area: line;
+  .intro {
+    grid-area: intro;
+    font: var(--type-intro);
+    color: var(--color-ink-2);
+    max-width: 31em;
+    text-wrap: pretty;
+  }
+
+  .seek {
+    font: var(--type-seek);
+    font-variant-numeric: lining-nums;
+    color: var(--color-ink);
+    margin-top: var(--space-6);
+    max-width: 26em;
+    text-wrap: balance;
+  }
+
+  .acts {
+    margin-top: var(--space-5);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) 28px;
+  }
+
+  .soc {
+    display: flex;
+    gap: var(--space-5);
+    white-space: nowrap;
+  }
+
+  .soc a {
+    font: var(--type-ui);
+  }
+
+  .btn {
+    display: inline-block;
+    background: var(--color-cta);
+    color: var(--color-cta-ink);
+    font: var(--type-button);
+    letter-spacing: var(--type-button-tracking);
+    text-decoration: none;
+    padding: 13px 26px;
+    border-radius: var(--radius-full);
+    transition: background-color var(--t) ease-out;
+  }
+
+  .btn:hover {
+    background: var(--color-cta-hover);
+    color: var(--color-cta-ink);
+  }
+
+  /* Short laptop screens: keep the whole first screen above the fold. */
+  @media (min-width: 1061px) and (max-height: 860px) {
+    .first {
+      padding-top: var(--space-5);
+      padding-bottom: var(--space-5);
+    }
+
+    .seek {
+      margin-top: var(--space-5);
+    }
   }
 
   @media (max-width: 1060px) {
+    .first {
+      min-height: 0;
+      padding-top: var(--space-7);
+      padding-bottom: var(--space-8);
+    }
+
+    .me {
+      grid-column: 1 / -1;
+      padding-right: 0;
+    }
+
     h1 {
       font: var(--type-name-tablet);
       letter-spacing: var(--type-name-tablet-tracking);
@@ -68,19 +176,19 @@ import headshot from '../assets/headshot-full.jpg';
   }
 
   @media (max-width: 760px) {
-    .intro {
+    .first {
       padding-top: var(--space-6);
       padding-bottom: var(--space-7);
     }
 
-    /* Phones: one column, the photo above the name, still on the left. */
+    /* Phones: one column, the photo above the name, still on the left; the intro runs full width. */
     .id {
       --pw: clamp(130px, 40vw, 160px);
       grid-template-columns: minmax(0, 1fr);
       grid-template-areas:
         'pic'
         'name'
-        'line';
+        'intro';
       grid-template-rows: auto auto auto;
     }
 
@@ -92,6 +200,27 @@ import headshot from '../assets/headshot-full.jpg';
     h1 {
       font: var(--type-name-mobile);
       letter-spacing: var(--type-name-mobile-tracking);
+      margin: 0;
+    }
+
+    .intro {
+      margin-top: var(--space-5);
+    }
+
+    .seek {
+      font: var(--type-seek-mobile);
+      font-variant-numeric: lining-nums;
+      margin-top: var(--space-5);
+    }
+
+    .acts {
+      gap: var(--space-3) var(--space-5);
+    }
+
+    .soc a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
     }
   }
 </style>

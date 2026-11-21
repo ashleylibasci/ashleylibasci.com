@@ -1,0 +1,89 @@
+---
+// Email address with a Copy button (AD-5 island). The address comes in as a prop,
+// so this island imports nothing from src/lib. Without the script the address is
+// still a working mail link.
+interface Props {
+  email: string;
+}
+
+const { email } = Astro.props;
+---
+<span class="grp" data-copy-email>
+  <a href={`mailto:${email}`}>{email}</a>
+  <button class="copy" type="button" aria-label="Copy email address">Copy</button>
+  <span class="sr" role="status"></span>
+</span>
+
+<script>
+  import './copy-email.ts';
+</script>
+
+<style>
+  .grp {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    white-space: nowrap;
+  }
+
+  a {
+    font: var(--type-ui);
+  }
+
+  .copy {
+    position: relative;
+    font: var(--type-small);
+    line-height: 1;
+    color: var(--color-ink-2);
+    background: transparent;
+    border: 1px solid var(--color-line-2);
+    border-radius: var(--radius-full);
+    padding: 5px 11px;
+    min-width: 56px;
+    cursor: pointer;
+    transition:
+      color var(--t) ease-out,
+      border-color var(--t) ease-out;
+  }
+
+  .copy:hover {
+    color: var(--color-ink);
+    border-color: var(--color-ink-3);
+  }
+
+  .copy.ok {
+    color: var(--color-teal-text);
+    border-color: var(--color-teal-text);
+  }
+
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (max-width: 760px) {
+    a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+
+    /* The pill stays small; its touch area is 44px tall. */
+    .copy::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 44px;
+      transform: translateY(-50%);
+    }
+  }
+</style>

@@ -119,6 +119,13 @@ a:hover {
   }
 }
 
+/* Mid widths: a slightly wider gutter on the home page. */
+@media (min-width: 900px) and (max-width: 1060px) {
+  body.on-home .wrap {
+    --gut: var(--space-gutter-home-mid);
+  }
+}
+
 @media (max-width: 760px) {
   .wrap {
     --gut: var(--space-gutter-mobile);

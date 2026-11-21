@@ -5,9 +5,10 @@ interface Props {
   items: readonly { key: string; label: string; href: string }[];
   section?: string;
   siteName: string;
+  email: string;
 }
 
-const { items, section, siteName } = Astro.props;
+const { items, section, siteName, email } = Astro.props;
 ---
 <button
   class="menu-btn menu-open"
@@ -32,6 +33,7 @@ const { items, section, siteName } = Astro.props;
     }
   </nav>
   <div class="sheet-foot">
+    <a class="mail" href={`mailto:${email}`}>{email}</a>
     <div data-slot="theme-toggle"><slot name="theme" /></div>
   </div>
 </dialog>
@@ -141,5 +143,11 @@ const { items, section, siteName } = Astro.props;
     align-items: center;
     gap: var(--space-3) var(--space-5);
     font: var(--type-ui);
+  }
+
+  .mail {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 </style>
