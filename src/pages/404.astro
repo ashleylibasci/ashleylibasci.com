@@ -1,0 +1,75 @@
+---
+// Lost page: what an unknown address gets. Built to dist/404.html for the host's
+// not-found rule. The two lines are the approved copy; the title is the skip-link
+// and page-load focus target. No nav tab is current here.
+import Base from '../layouts/Base.astro';
+import { navItem } from '../lib/nav';
+
+const home = navItem('home');
+---
+<Base title="Not found">
+  <div class="wrap lost">
+    <div class="lost-in">
+      <div class="text">
+        <h1 id="page-heading" tabindex="-1">This page swam off.</h1>
+        <p class="standfirst">It isn't here, but everything else is.</p>
+        <p class="links"><a href={home.href}>Back to the home page</a></p>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  /* Centered in the space the bar and the footer leave. */
+  .lost {
+    /* Room for the footer, as the design gives it; a little over its one-line height. */
+    --foot: 82px;
+    min-height: calc(100vh - var(--nav) - var(--foot));
+    min-height: calc(100svh - var(--nav) - var(--foot));
+    display: flex;
+    align-items: center;
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-8);
+  }
+
+  /* A row, so a drawing can sit beside the text. */
+  .lost-in {
+    display: flex;
+    align-items: center;
+    gap: 44px;
+  }
+
+  .text {
+    min-width: 0;
+  }
+
+  h1 {
+    font: var(--type-page-title);
+    font-size: clamp(40px, 4.3vw, 60px);
+  }
+
+  .standfirst {
+    margin-top: var(--space-4);
+    font: var(--type-standfirst);
+    max-width: 38em;
+    color: var(--color-ink-2);
+  }
+
+  .links {
+    margin-top: var(--space-5);
+    font: var(--type-ui);
+  }
+
+  @media (max-width: 760px) {
+    .lost-in {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-5);
+    }
+
+    /* A 44px touch area for the one link; inline padding moves no line. */
+    .links a {
+      padding: 13px 0;
+    }
+  }
+</style>
