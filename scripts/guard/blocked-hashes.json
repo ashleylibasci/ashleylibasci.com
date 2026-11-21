@@ -1,0 +1,84 @@
+{
+  "version": 2,
+  "algorithm": "hmac-sha256",
+  "key_env": "GUARD_KEY",
+  "normalization": "NFKC, lowercase, tokens of [\\p{L}\\p{N}]+ joined by one space",
+  "terms": [
+    {
+      "id": 1,
+      "words": 1,
+      "hmac": "5f7a77603ae0bfc0f2786ba43d4e3149a5378b1f6ff583d4252843daf36dc0fc"
+    },
+    {
+      "id": 2,
+      "words": 1,
+      "hmac": "240695d17e48c28baaaac709de2abb5324a18721d01d387ddcc2572ae0cc71f7"
+    },
+    {
+      "id": 3,
+      "words": 1,
+      "hmac": "c5b64736e3868ef9e3aee448130a1a5b80f57f50f359588287b1ee86ce8b6226"
+    },
+    {
+      "id": 4,
+      "words": 1,
+      "hmac": "2c788078be95640e052b1758bf3ad9eaa61f26cb329c20d73078f931244e0095"
+    },
+    {
+      "id": 5,
+      "words": 1,
+      "hmac": "af63c59ec46c181e36f3085df96399044209c4d4157dea4abf35833b97c3e04a"
+    },
+    {
+      "id": 6,
+      "words": 1,
+      "hmac": "606cd1891dc2bae9653f13e278bd65be941ccd149c7c66b98516440cef06793d"
+    },
+    {
+      "id": 7,
+      "words": 2,
+      "hmac": "faf5a2bba9704cf18a396812e1596d7d0d097cb1ea355287222813ea31ce4893"
+    },
+    {
+      "id": 8,
+      "words": 1,
+      "hmac": "1e489ed5f406a8a71fb7dcf22aeede0b92cd7e436051511d5f857c1dddc0adc8"
+    },
+    {
+      "id": 9,
+      "words": 1,
+      "hmac": "17ab2624e0dab86f61bb33754c351eb75b2eec910f62255a22671a2b4efdaef2"
+    },
+    {
+      "id": 10,
+      "words": 1,
+      "hmac": "7189182288116423d7386f94ddcd91bb5585a9d62ba2ccb9d6650274bdfd5108"
+    },
+    {
+      "id": 11,
+      "words": 2,
+      "hmac": "1f84f26941699618e142e034cc8d791dd49279accc749e84497ada610a138a30"
+    },
+    {
+      "id": 12,
+      "words": 1,
+      "hmac": "ed70cc9dc97b5cc5890416143aa155c4324aef5af88647ba0f0d758309137067"
+    },
+    {
+      "id": 13,
+      "words": 1,
+      "hmac": "95b31e49932e002e07e4913edef129f0a5a45727b5b300426c9b008cfc21bad3"
+    },
+    {
+      "id": 14,
+      "words": 1,
+      "hmac": "be8306d4b3711e9ca524d47e58c1b67ee2c8205ea9784e1599ada5abf3e0599a"
+    }
+  ],
+  "phones": [
+    {
+      "id": 1,
+      "hmac": "48aead54843f4c98bfdc3eef871d249b7f43aa75ce7e60fb98ce561fe1af90d1"
+    }
+  ]
+}

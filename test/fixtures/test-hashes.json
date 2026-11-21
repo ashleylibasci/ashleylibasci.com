@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "algorithm": "hmac-sha256",
+  "key_env": "GUARD_KEY",
+  "note": "Test-only hashes of harmless words, keyed by the test key in test/guard.test.mjs.",
+  "terms": [
+    {
+      "id": 1,
+      "words": 1,
+      "hmac": "e5c1b64a4eb49af02177fba8bb5c1f3083432bd32d288d0ac57eb77076888ad3"
+    },
+    {
+      "id": 2,
+      "words": 2,
+      "hmac": "7b085a78f9fa77ab4764185888adb493b4a1b119f5954cd0f05f53c143f39266"
+    }
+  ],
+  "phones": [
+    {
+      "id": 1,
+      "hmac": "ef0daf7e0c7770e3573738c88b24b571c8693beddf6a9c924aa214a064c5b21d"
+    }
+  ]
+}
