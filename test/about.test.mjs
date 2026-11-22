@@ -1,6 +1,6 @@
 // About page: the skills collection as the mockup lists it, the page reading its facts from
 // the collections and CONTACTS, the About and Resume nav items, the Resume section and its
-// Placeholder, and the rules the page and its components keep in their source.
+// PDF, and the rules the page and its components keep in their source.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -15,8 +15,7 @@ const read = (/** @type {string[]} */ ...parts) => readFileSync(join(src, ...par
 const page = read('pages', 'about.astro');
 const head = read('components', 'PageHead.astro');
 const section = read('components', 'ArticleSection.astro');
-const placeholder = read('components', 'Placeholder.astro');
-const all = [page, head, section, placeholder];
+const all = [page, head, section];
 
 // The skills files as plain text: a label, a list of items, an order. No YAML parser is installed.
 const skillsDir = join(src, 'content', 'skills');
@@ -126,11 +125,13 @@ test('the Resume section sits at the nav item\'s fragment and clears the sticky 
   assert.match(read('islands', 'menu-sheet', 'menu-sheet.ts'), /if \(target instanceof Element && target\.closest\('a'\)\) close\(false\);/);
 });
 
-test('the Placeholder: the designed dashed box with the approved line', () => {
-  assert.match(page, /<Placeholder>The resume PDF and its download link go here\.<\/Placeholder>/);
-  assert.match(placeholder, /\.placeholder \{[^}]*max-width: 42em;\s*padding: var\(--space-5\);\s*border: 1px dashed var\(--color-line-2\);\s*border-radius: var\(--radius-md\);\s*color: var\(--color-ink-3\);/);
-  // No resume file and no download link yet.
-  assert.equal(/\.pdf|download=/.test(page), false);
+test('the Resume section links the one-page PDF and no Placeholder ships', () => {
+  assert.match(page, /const RESUME_PDF = '\/ashley-libasci-resume\.pdf';/);
+  assert.match(page, /<a href=\{RESUME_PDF\} download="Ashley Libasci resume\.pdf">Download the resume<\/a>/);
+  assert.match(page, /<a href=\{RESUME_PDF\}>open it in the browser<\/a>/);
+  assert.equal(existsSync(join(src, '..', 'public', 'ashley-libasci-resume.pdf')), true);
+  assert.equal(existsSync(join(src, 'components', 'Placeholder.astro')), false);
+  assert.equal(/Placeholder/.test(page), false);
 });
 
 test('every PageHead crumb links to its page; the Experience Resume link is always rendered', () => {

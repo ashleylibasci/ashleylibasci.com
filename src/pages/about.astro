@@ -2,13 +2,12 @@
 // About: the greeting beside the smaller framed headshot, then Now, Education, Skills,
 // Contact and Resume. Education comes from the experience collection, Skills from the
 // skills collection and the addresses from CONTACTS. The Resume section lives at
-// /about#resume and holds the Placeholder until the PDF is supplied.
+// /about#resume and links the one-page PDF in public/.
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ArticleSection from '../components/ArticleSection.astro';
 import FramedImage from '../components/FramedImage.astro';
 import PageHead from '../components/PageHead.astro';
-import Placeholder from '../components/Placeholder.astro';
 import PrintFrame from '../components/PrintFrame.astro';
 import { CONTACTS } from '../lib/contacts';
 import { formatRange } from '../lib/format';
@@ -21,6 +20,7 @@ const experience = navItem('experience');
 const resume = navItem('resume');
 // The Resume item must point at a section of this page.
 const [resumePath, resumeAnchor] = resume.href.split('#');
+const RESUME_PDF = '/ashley-libasci-resume.pdf';
 if (resumePath !== page.href || !resumeAnchor) throw new Error(`about: the Resume item "${resume.href}" is not a section of ${page.href}`);
 
 const schools = (await getCollection('experience')).flatMap(({ data }) => (data.kind === 'education' ? [data] : []));
@@ -79,7 +79,7 @@ const shown = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '');
     </ArticleSection>
     <ArticleSection id="resume-heading" heading={resume.label} anchor={resumeAnchor}>
       <p>One page, updated November 2026.</p>
-      <Placeholder>The resume PDF and its download link go here.</Placeholder>
+      <p><a href={RESUME_PDF} download="Ashley Libasci resume.pdf">Download the resume</a> (PDF, 105 KB) or <a href={RESUME_PDF}>open it in the browser</a>.</p>
     </ArticleSection>
   </div>
 </Base>
