@@ -2,6 +2,8 @@
 
 Source for Ashley Libasci's portfolio site, a static site built with [Astro](https://astro.build) and hosted on AWS Amplify.
 
+Live at https://ashleylibasci.com. Career Star, which used to live at this address, is at https://careerstar.ashleylibasci.com; its old links forward there (see `redirects.json`).
+
 ```bash
 npm install
 npm run dev     # local preview at http://localhost:4321
