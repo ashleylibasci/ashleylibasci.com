@@ -4,6 +4,7 @@ import '../styles/tokens.css';
 import '../styles/base.css';
 import { SITE_NAME } from '../lib/nav';
 import { CONTACTS } from '../lib/contacts';
+import { canonicalUrl } from '../lib/canonical';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
 import PageFocus from '../islands/page-focus/PageFocus.astro';
@@ -19,6 +20,7 @@ interface Props {
 
 const { title, section } = Astro.props;
 const fullTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
+const canonical = canonicalUrl(Astro.url.pathname);
 // The inline head script below sets the theme before first paint (AD-7):
 // light unless the stored choice is dark. It is the only initial writer.
 ---
@@ -40,6 +42,7 @@ const fullTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
     <Font cssVariable="--font-marcellus" preload={[{ weight: 400, style: 'normal' }]} />
     <Font cssVariable="--font-albert-sans" preload={[{ weight: 400, style: 'normal' }]} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {canonical && <link rel="canonical" href={canonical} />}
   </head>
   <body class:list={[{ 'on-home': section === 'home' }]}>
     <a class="skip" href="#page-heading">Skip to content</a>

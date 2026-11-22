@@ -1,1 +1,92 @@
-[]
+[
+  {
+    "source": "/architecture",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/architecture",
+    "condition": null
+  },
+  {
+    "source": "/career/<*>",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/career/<*>",
+    "condition": null
+  },
+  {
+    "source": "/case-study",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/case-study",
+    "condition": null
+  },
+  {
+    "source": "/explore",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/explore",
+    "condition": null
+  },
+  {
+    "source": "/field/<*>",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/field/<*>",
+    "condition": null
+  },
+  {
+    "source": "/methodology",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/methodology",
+    "condition": null
+  },
+  {
+    "source": "/rate",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/rate",
+    "condition": null
+  },
+  {
+    "source": "/sky",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/sky",
+    "condition": null
+  },
+  {
+    "source": "/top-20",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/top-20",
+    "condition": null
+  },
+  {
+    "source": "/api/<*>",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/api/<*>",
+    "condition": null
+  },
+  {
+    "source": "/og.png",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/og.png",
+    "condition": null
+  },
+  {
+    "source": "/careerstar-ratings.csv",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/careerstar-ratings.csv",
+    "condition": null
+  },
+  {
+    "source": "/star-trails-duotone.jpg",
+    "status": "301",
+    "target": "https://careerstar.ashleylibasci.com/star-trails-duotone.jpg",
+    "condition": null
+  },
+  {
+    "source": "https://www.ashleylibasci.com",
+    "status": "301",
+    "target": "https://ashleylibasci.com",
+    "condition": null
+  },
+  {
+    "source": "/<*>",
+    "status": "404",
+    "target": "/404.html",
+    "condition": null
+  }
+]

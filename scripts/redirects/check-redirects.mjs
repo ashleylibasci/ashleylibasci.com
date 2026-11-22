@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // @ts-check
 // Redirect gate: redirects.json (Amplify custom-rules array) must be well-formed, keep
-// 404 rules last (AD-16), have no `/<*>` 200 catch-all rewrite, and never shadow a dist/ file
-// with a 200/301/302 rule. 404 rules are not collision-checked: Amplify applies them
+// 404 rules last (AD-16), have no `/<*>` 200 catch-all rewrite, have no path on a domain
+// source (Amplify ignores `https://host/path` sources and appends the path itself), and
+// never shadow a dist/ file with a 200/301/302 rule. 404 rules are not collision-checked: Amplify applies them
 // only when no file matches.
 import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
@@ -42,6 +43,7 @@ if (Array.isArray(rules)) {
     if ((typeof status !== 'string' && typeof status !== 'number') || !STATUSES.has(String(status))) bad.push('status');
     if (condition !== undefined && condition !== null && typeof condition !== 'string') bad.push('condition');
     if (bad.length) return report(`rule ${n} has a missing or invalid ${bad.join(', ')}`);
+    if (/^https?:\/\/[^/]+\//i.test(source)) report(`rule ${n} (${source}) has a path on a domain source; Amplify ignores it`);
     valid.push({ n, source, status: String(status) });
   });
 }

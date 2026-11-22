@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,7 +37,7 @@ test('empty rules pass', () => {
 });
 
 test('non-colliding rules pass', () => {
-  const r = run([rule('/old', '301', '/work'), rule('/career', '302', '/work'), rule('https://www.ashleylibasci.com/<*>', '301', 'https://ashleylibasci.com/<*>'), rule('/<*>', '404-200', '/404.html')]);
+  const r = run([rule('/old', '301', '/work'), rule('/career', '302', '/work'), rule('https://www.ashleylibasci.com', '301', 'https://ashleylibasci.com'), rule('/<*>', '404-200', '/404.html')]);
   assert.equal(r.code, 0, r.out);
 });
 
@@ -106,4 +106,23 @@ test('missing dist/ is a finding', () => {
   const r = run([], null);
   assert.equal(r.code, 1);
   assert.match(r.out, /dist\/: missing/);
+});
+
+test('a path on a domain source is a finding', () => {
+  for (const source of ['https://www.ashleylibasci.com/<*>', 'https://www.ashleylibasci.com/']) {
+    const r = run([rule(source, '301', 'https://ashleylibasci.com')]);
+    assert.equal(r.code, 1, source);
+    assert.ok(r.out.includes(`rule 1 (${source}) has a path on a domain source; Amplify ignores it`), r.out);
+  }
+});
+
+test('the real redirects.json: Career Star paths, then www, then the 404 last', () => {
+  const rules = JSON.parse(readFileSync(join(here, '..', 'redirects.json'), 'utf8'));
+  const CAREER_STAR = ['/architecture', '/career/<*>', '/case-study', '/explore', '/field/<*>', '/methodology', '/rate', '/sky', '/top-20', '/api/<*>', '/og.png', '/careerstar-ratings.csv', '/star-trails-duotone.jpg'];
+  assert.equal(rules.length, 15);
+  CAREER_STAR.forEach((source, i) => {
+    assert.deepEqual(rules[i], { source, status: '301', target: `https://careerstar.ashleylibasci.com${source}`, condition: null });
+  });
+  assert.deepEqual(rules[13], { source: 'https://www.ashleylibasci.com', status: '301', target: 'https://ashleylibasci.com', condition: null });
+  assert.deepEqual(rules[14], { source: '/<*>', status: '404', target: '/404.html', condition: null });
 });

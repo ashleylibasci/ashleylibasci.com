@@ -13,6 +13,7 @@
     "check:links": "node scripts/links/check-links.mjs",
     "check:redirects": "node scripts/redirects/check-redirects.mjs",
     "preview": "astro preview",
+    "sync-redirects": "node scripts/redirects/sync-redirects.mjs",
     "guard": "node --env-file-if-exists=.env scripts/guard/guard.mjs",
     "test": "node --test \"test/**/*.test.mjs\""
   },
