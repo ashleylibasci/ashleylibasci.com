@@ -85,7 +85,7 @@
   },
   {
     "source": "/<*>",
-    "status": "404",
+    "status": "404-200",
     "target": "/404.html",
     "condition": null
   }

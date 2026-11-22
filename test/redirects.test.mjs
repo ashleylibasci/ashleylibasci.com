@@ -124,5 +124,5 @@ test('the real redirects.json: Career Star paths, then www, then the 404 last', 
     assert.deepEqual(rules[i], { source, status: '301', target: `https://careerstar.ashleylibasci.com${source}`, condition: null });
   });
   assert.deepEqual(rules[13], { source: 'https://www.ashleylibasci.com', status: '301', target: 'https://ashleylibasci.com', condition: null });
-  assert.deepEqual(rules[14], { source: '/<*>', status: '404', target: '/404.html', condition: null });
+  assert.deepEqual(rules[14], { source: '/<*>', status: '404-200', target: '/404.html', condition: null });
 });
