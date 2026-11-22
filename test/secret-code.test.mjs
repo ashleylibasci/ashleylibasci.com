@@ -216,12 +216,13 @@ test('markup: one hidden layer and the script; styles on tokens with the still l
   assert.equal(/rise-up/.test(source), false);
 });
 
-test('Base mounts the code once, after page-focus, and keeps one inline script', () => {
+test('Base mounts the code once, after page-focus, and keeps one inline head script', () => {
   const base = read('layouts', 'Base.astro');
   assert.match(base, /import SecretCode from '\.\.\/islands\/secret-code\/SecretCode\.astro';/);
   assert.equal([...base.matchAll(/<SecretCode \/>/g)].length, 1);
   assert.match(base, /<PageFocus \/>\s*<SecretCode \/>/);
-  assert.equal([...base.matchAll(/<script/g)].length, 1);
+  // One inline script in the head (the theme); the only other script is the analytics beacon.
+  assert.equal([...base.matchAll(/<script/g)].length - [...base.matchAll(/<script[^>]*cloudflareinsights/g)].length, 1);
 });
 
 test('the client script imports nothing outside its own folder', () => {

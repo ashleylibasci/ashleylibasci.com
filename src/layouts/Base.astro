@@ -23,6 +23,9 @@ const fullTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
 const canonical = canonicalUrl(Astro.url.pathname);
 // The inline head script below sets the theme before first paint (AD-7):
 // light unless the stored choice is dark. It is the only initial writer.
+// The Cloudflare Web Analytics beacon (AD-11) is the only third-party request: cookieless,
+// page views only. Its token is public by design; it is not a secret.
+const ANALYTICS_TOKEN = '1265ff617cb540e59b9de2a126db2a2c';
 ---
 <!doctype html>
 <html lang="en">
@@ -54,5 +57,6 @@ const canonical = canonicalUrl(Astro.url.pathname);
     <PageFocus />
     <SecretCode />
     <ConsoleHello href={CONTACTS.github} />
+    <script is:inline type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: ANALYTICS_TOKEN })}></script>
   </body>
 </html>

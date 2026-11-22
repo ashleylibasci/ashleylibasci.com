@@ -49,13 +49,15 @@ test('styles with empty tokens: plain names then generic fonts, no colour declar
   assert.equal(/color/.test(link), false);
 });
 
-test('Base mounts the hello once, last in body, with the GitHub link from contacts', () => {
+test('Base mounts the hello once, last island in body, with the GitHub link from contacts', () => {
   const base = read('layouts', 'Base.astro');
   assert.match(base, /import \{ CONTACTS \} from '\.\.\/lib\/contacts';/);
   assert.match(base, /import ConsoleHello from '\.\.\/islands\/console-hello\/ConsoleHello\.astro';/);
   assert.equal([...base.matchAll(/<ConsoleHello /g)].length, 1);
-  assert.match(base, /<ConsoleHello href=\{CONTACTS\.github\} \/>\s*<\/body>/);
-  assert.equal([...base.matchAll(/<script/g)].length, 1);
+  // Last island in the body; only the analytics beacon follows it.
+  assert.match(base, /<ConsoleHello href=\{CONTACTS\.github\} \/>\s*<script is:inline type="module" src="https:\/\/static\.cloudflareinsights\.com\/beacon\.min\.js"[^>]*><\/script>\s*<\/body>/);
+  // The theme script and the analytics beacon.
+  assert.equal([...base.matchAll(/<script/g)].length, 2);
 });
 
 test('carrier: one hidden span with the link as data only, the script, no styles', () => {
