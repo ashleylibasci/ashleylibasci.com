@@ -27,3 +27,10 @@ test('Base renders one canonical link, inside the head', () => {
   const head = base.slice(base.indexOf('<head>'), base.indexOf('</head>'));
   assert.ok(head.includes('<link rel="canonical" href={canonical} />'));
 });
+
+test('the Astro site, the canonical origin and the gates name the same apex', async () => {
+  const config = readFileSync(join(root, 'astro.config.mjs'), 'utf8');
+  assert.equal(/^\s*site: '([^']+)',$/m.exec(config)?.[1], CANONICAL_ORIGIN);
+  const { APEX } = await import('../scripts/lib/urls.mjs');
+  assert.equal(`https://${APEX}`, CANONICAL_ORIGIN);
+});

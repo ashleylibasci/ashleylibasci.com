@@ -4,7 +4,7 @@ import '../styles/tokens.css';
 import '../styles/base.css';
 import { SITE_NAME } from '../lib/nav';
 import { CONTACTS } from '../lib/contacts';
-import { canonicalUrl } from '../lib/canonical';
+import { CANONICAL_ORIGIN, canonicalUrl } from '../lib/canonical';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
 import PageFocus from '../islands/page-focus/PageFocus.astro';
@@ -31,7 +31,7 @@ const ANALYTICS_TOKEN = '1265ff617cb540e59b9de2a126db2a2c';
 // the name card Ashley chose) and the one site description.
 const DESCRIPTION =
   'Ashley Libasci studies math and computer science at UIUC and is looking for a software engineering, cybersecurity or quant internship for summer 2027.';
-const SOCIAL_CARD = new URL('/social-card.png', Astro.site).href;
+const SOCIAL_CARD = new URL('/social-card.png', CANONICAL_ORIGIN).href;
 ---
 <!doctype html>
 <html lang="en">

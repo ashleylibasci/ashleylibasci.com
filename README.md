@@ -13,6 +13,6 @@ npm run check:links      # internal links, assets and fragments in dist/ (after 
 npm run check:redirects  # redirects.json shape, 404 order and collisions with dist/ (after build)
 npm run -s sync-redirects -- --dry-run   # rules to paste into Amplify > Rewrites and redirects > Manage redirects > JSON editor
 npm run sync-redirects -- --app-id <id>  # apply the rules to the Amplify app (needs the AWS CLI)
-npm test        # privacy guard, link and redirect gate tests
+npm test        # unit tests for the pages, islands and gates
 npm run guard   # privacy guard over source, public/, dist/ and PDFs (needs GUARD_KEY in .env)
 ```

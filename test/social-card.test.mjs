@@ -16,7 +16,7 @@ test('the social card is a 1200x630 PNG in public/', () => {
 });
 
 test('the base layout sets description, Open Graph and large-card tags once each', () => {
-  assert.match(base, /const SOCIAL_CARD = new URL\('\/social-card\.png', Astro\.site\)\.href;/);
+  assert.match(base, /const SOCIAL_CARD = new URL\('\/social-card\.png', CANONICAL_ORIGIN\)\.href;/);
   for (const tag of ['name="description"', 'property="og:title"', 'property="og:description"', 'property="og:image"', 'property="og:image:alt"', 'name="twitter:card"']) {
     assert.equal(base.split(tag).length - 1, 1, tag);
   }

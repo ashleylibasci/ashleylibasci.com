@@ -3,8 +3,8 @@
 // Redirect gate: redirects.json (Amplify custom-rules array) must be well-formed, keep
 // 404 rules last (AD-16), have no `/<*>` 200 catch-all rewrite, have no path on a domain
 // source (Amplify ignores `https://host/path` sources and appends the path itself), and
-// never shadow a dist/ file with a 200/301/302 rule. 404 rules are not collision-checked: Amplify applies them
-// only when no file matches.
+// never shadow a dist/ file with a 200/301/302 rule. 404 rules are not collision-checked:
+// Amplify applies them only when no file matches.
 import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { distFileUrls, listDist, matchesSource, readRedirects, sourcePath, urlToDistFile } from '../lib/urls.mjs';
