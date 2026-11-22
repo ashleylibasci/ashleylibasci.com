@@ -47,7 +47,9 @@ function run({ stored = null, throws = false } = {}) {
   return { attrs, writes };
 }
 
-test('Base.astro has exactly one inline script, in the head before the title', () => {
+// `<script is:inline>` with no attributes is the theme script; the analytics beacon
+// (`<script is:inline type="module" ...>`) is checked in analytics.test.mjs.
+test('Base.astro has exactly one theme head script, before the title', () => {
   assert.equal(scripts.length, 1);
   const at = base.indexOf('<script is:inline>');
   assert.ok(at > base.indexOf('<head>'));

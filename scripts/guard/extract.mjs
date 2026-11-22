@@ -37,7 +37,7 @@ export function markdownText(raw) {
   let fence = null;
   const source = raw
     .replace(/<(code|pre)\b[\s\S]*?<\/\1\s*>/gi, blank)
-    .replace(/(\]\()([^)\s]*)/g, (m, open, url) => open + blank(url));
+    .replace(/(\]\()([^)\s]*)/g, (_, open, url) => open + blank(url));
   return source
     .split('\n')
     .map((line) => {
