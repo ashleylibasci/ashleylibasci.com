@@ -19,8 +19,11 @@ function rastersIn(/** @type {string} */ dir) {
     .sort();
 }
 
-test('public/ holds no raster image', () => {
-  const found = rastersIn(join(root, 'public')).map((file) => `public/${file}`);
+// The social card is the one exception (AD-10): link previews need its fixed, unhashed address.
+const PUBLIC_RASTERS = new Set(['public/social-card.png']);
+
+test('public/ holds no raster image but the social card', () => {
+  const found = rastersIn(join(root, 'public')).map((file) => `public/${file}`).filter((file) => !PUBLIC_RASTERS.has(file));
   assert.deepEqual(found, [], `move to src/assets/ and serve through astro:assets: ${found.join(', ')}`);
 });
 
